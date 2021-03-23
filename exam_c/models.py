@@ -234,27 +234,33 @@ class CodingQuestion(models.Model):
     problem_type_.short_description = '试卷类型'
 
     def question_html_(self):
-        if self.upload_description_file is not None:
+        # print(self.upload_description_file, type(self.upload_description_file))
+        try:
+        # if self.upload_description_file is not None:
             with open(self.upload_description_file.path,'r', encoding='utf-8') as f:
-                print(self.upload_description_file.path)
                 lines = f.readlines()
                 return format_html_join(
                         '', '<p style="color:{};">{}</p>',
                         (('black', x) for x in lines)
                         )
-        else:
+        except:
+        # else:
             return ''
+        # return ''
     question_html_.short_description = '题目'
 
 
     def code_html_(self):
-        if self.upload_c_file is not None:
+        # if self.upload_c_file is not None:
+        try:
             with open(self.upload_c_file.path,'r', encoding='utf-8') as f:
                 lines = f.readlines()
                 return format_html_join(
                         '', '<p style="color:{};">{}</p>',
                         (('black', x) for x in lines)
                         )
-        else:
+        # else:
+        except:
             return ''
+        # return ''
     code_html_.short_description = '代码'
