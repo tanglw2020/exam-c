@@ -22,7 +22,7 @@ class ExamAdmin(admin.ModelAdmin):
 
 
 class ExamPaperAdmin(admin.ModelAdmin):
-        list_display = ('__str__', 'problem_type', 'student_id', 'exam_id', 'start_time_')
+        list_display = ('__str__', 'problem_type', 'student', 'exam', 'start_time_')
 
 
 ###########

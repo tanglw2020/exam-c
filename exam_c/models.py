@@ -83,12 +83,12 @@ class ExamPaper(models.Model):
         return '试卷'+str(self.id)
 
     problem_type = models.CharField("试卷类型", max_length=20, choices=EXAM_TYPE_CHOICES, default='1')
-    student_id = models.ForeignKey(
+    student = models.ForeignKey(
         Student,
         on_delete=models.CASCADE, null=True,
         verbose_name='所属考生'
     ) 
-    exam_id = models.ForeignKey(
+    exam = models.ForeignKey(
         Exam,
         on_delete=models.CASCADE, null=True,
         verbose_name='所属考试'

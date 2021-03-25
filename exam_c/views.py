@@ -16,8 +16,12 @@ def exam_detail(request, exam_id):
     except Exam.DoesNotExist:
         raise Http404("exam does not exist")
     
+    exam_papers = exam.exampaper_set.all()
+    # for exam_paper in exam_papers:
+        # print(exam_paper.student, exam_paper.student.id)
     context = {
         'exam': exam,
         'exam_id': exam_id,
+        'exam_papers': exam_papers,
         }
     return render(request, 'exam_c/exam_detail.html', context)

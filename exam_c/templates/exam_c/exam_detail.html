@@ -54,22 +54,32 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">考试详情</a>
+                <a class="navbar-brand" href="#"></a>
             </div>
-            <div id="navbar" class="collapse navbar-collapse">
+            <!-- <div id="navbar" class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
                     <li class="active"><a href="#">{{ exam.exam_type_ }}</a></li>
                     <li><a href="#">{{ exam.period_ }}</a></li>
                 </ul>
-            </div>
+            </div> -->
             <!--/.nav-collapse -->
         </div>
     </nav>
 
+
+    <div class="jumbotron">
+      <div class="container">
+        <h1>{{ exam.exam_type_ }}<small>在线考试系统</small></h1>
+        <p>考试时长: {{ exam.period_ }}</p>
+        <p>考试人数: {{ exam_papers.count }}</p>
+        <!-- <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a></p> -->
+      </div>
+    </div>
+
     <div class="container">
 
         <div class="starter-template">
-            <h1>考生情况列表</h1>
+            <h1>考生列表</h1>
             
             </div>
             <div class="row">
@@ -78,30 +88,23 @@
                   <thead>
                     <tr>
                       <th>#</th>
-                      <th>创建时间</th>
-                      <th>考试信息</th>
-                      <th>详情况链接</th>
+                      <th>班级</th>
+                      <th>姓名</th>
+                      <th>学号</th>
+                      <th>开考时间</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>1</td>
-                      <td>Mark</td>
-                      <td>Otto</td>
-                      <td>@mdo</td>
-                    </tr>
-                    <tr>
-                      <td>2</td>
-                      <td>Jacob</td>
-                      <td>Thornton</td>
-                      <td>@fat</td>
-                    </tr>
-                    <tr>
-                      <td>3</td>
-                      <td>Larry</td>
-                      <td>the Bird</td>
-                      <td>@twitter</td>
-                    </tr>
+                    {% for exam_paper in exam_papers %}
+                      <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ exam_paper.student.class_name }}</td>
+                        <td>{{ exam_paper.student.student_name }}</td>
+                        <td>{{ exam_paper.student.student_id }}</td>
+                        <td>{{ exam_paper.start_time_ }}</td>
+                      </tr>
+                    {% endfor %}
+
                   </tbody>
                 </table>
     
