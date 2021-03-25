@@ -18,7 +18,7 @@ class StudentAdmin(admin.ModelAdmin):
 
 
 class ExamAdmin(admin.ModelAdmin):
-        list_display = ('id_', 'problem_type', 'info_text', )
+        list_display = ('id_', 'problem_type', 'info_text', 'out_link_')
 
 
 class ExamPaperAdmin(admin.ModelAdmin):

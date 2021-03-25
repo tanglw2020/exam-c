@@ -8,3 +8,16 @@ def index(request):
     exam_list = Exam.objects.all()
     
     return render(request, 'exam_c/index.html')
+
+
+def exam_detail(request, exam_id):
+    try:
+        exam = Exam.objects.get(id=exam_id)
+    except Exam.DoesNotExist:
+        raise Http404("exam does not exist")
+    
+    context = {
+        'exam': exam,
+        'exam_id': exam_id,
+        }
+    return render(request, 'exam_c/exam_detail.html', context)

@@ -34,7 +34,8 @@ class Exam(models.Model):
         verbose_name_plural = '考试场次'
     pub_date = models.DateTimeField('创建时间', 'date published', null=True)
     problem_type = models.CharField("试卷类型", max_length=20, choices=EXAM_TYPE_CHOICES, default='1')
-    info_text = models.CharField('考试信息', max_length=200)
+    creator = models.CharField('创建人', max_length=200, default='')
+    info_text = models.CharField('考试信息', max_length=200, default='')
     period = models.CharField("考试时长", max_length=5, choices=PERIOD_CHOICES, default='1')
 
     def __str__(self):
@@ -43,6 +44,18 @@ class Exam(models.Model):
     def id_(self):
         return str(self.id)
     id_.short_description = '考试编号'
+
+    def exam_type_(self):
+        return str(EXAM_TYPE_CHOICES[int(self.problem_type)-1][1])
+    exam_type_.short_description = '考试类型'
+
+    def period_(self):
+        return str(PERIOD_CHOICES[int(self.period)-1][1])
+    period_.short_description = '考试时长'
+
+    def out_link_(self):
+        return format_html('<a href="http://127.0.0.1:8000/c/exam/{}" target="_blank">查看</a>'.format(self.id))
+    out_link_.short_description = '考试情况'
 
 
 class Student(models.Model):
