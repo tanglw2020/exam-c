@@ -62,49 +62,13 @@ class Student(models.Model):
     class Meta:
         verbose_name = '考生'
         verbose_name_plural = '考生'
-    class_name = models.CharField('班级',max_length=20, default='')
+    class_name = models.CharField('班级',max_length=100, default='')
     student_name = models.CharField('姓名', max_length=20, default='')
     student_id = models.CharField('学号', max_length=20, default='')
     pass_word = models.CharField('密码', max_length=20, default='', blank=True)
 
-    # current_exam_id = models.CharField('当前考试编号', max_length=20, default='', blank=True)
-    # current_paper_id = models.CharField('当前试卷编号', max_length=20, default='', blank=True)
-
     def __str__(self):
         return self.class_name+" "+self.student_name +" "+self.student_id
-
-
-class ExamPaper(models.Model):
-    class Meta:
-        verbose_name = '试卷'
-        verbose_name_plural = '试卷'
-
-    def __str__(self):
-        return '试卷'+str(self.id)
-
-    problem_type = models.CharField("试卷类型", max_length=20, choices=EXAM_TYPE_CHOICES, default='1')
-    student = models.ForeignKey(
-        Student,
-        on_delete=models.CASCADE, null=True,
-        verbose_name='所属考生'
-    ) 
-    exam = models.ForeignKey(
-        Exam,
-        on_delete=models.CASCADE, null=True,
-        verbose_name='所属考试'
-    ) 
-
-    start_time = models.DateTimeField('开考时间', null=True, blank=True,)
-
-    choice_questions = models.TextField("选择题列表", max_length=1000,  blank=True, default='')
-    choice_question_answers = models.TextField("选择题答案列表", max_length=1000, blank=True,  default='')
-
-    coding_questions = models.TextField("编程题列表", max_length=1000, blank=True, default='')
-    coding_question_answers = models.TextField("编程题答案列表", max_length=1000, blank=True, default='')
-
-    def start_time_(self):
-        return str(self.start_time)
-    start_time_.short_description = '开考时间'
 
 
 class ChoiceQuestion(models.Model):
@@ -172,6 +136,14 @@ def validate_cfile(value):
     if extension not in ['c',]:
         raise ValidationError(
             _(value.name+'不是c文件'),
+            params={'value': value.name},
+        )
+
+def validate_csvfile(value):
+    extension = value.name.split('.')[-1]
+    if extension not in ['csv',]:
+        raise ValidationError(
+            _(value.name+'不是csv文件'),
             params={'value': value.name},
         )
 
@@ -278,3 +250,64 @@ class CodingQuestion(models.Model):
 #         answer_text_list = [x.strip() for x in answer_text_list if len(x.strip())>0]
 #         if len(answer_text_list) != count_flags:
 #             raise ValidationError({'question_text': _('______和答案数目不一致')})
+
+
+class ExamPaper(models.Model):
+    class Meta:
+        verbose_name = '试卷'
+        verbose_name_plural = '试卷'
+
+    def __str__(self):
+        return '试卷'+str(self.id)
+
+    problem_type = models.CharField("试卷类型", max_length=20, choices=EXAM_TYPE_CHOICES, default='1')
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE, null=True,
+        verbose_name='所属考生'
+    ) 
+    exam = models.ForeignKey(
+        Exam,
+        on_delete=models.CASCADE, null=True,
+        verbose_name='所属考试'
+    ) 
+
+    start_time = models.DateTimeField('开考时间', null=True, blank=True,)
+
+    choice_questions = models.TextField("选择题列表", max_length=1000,  blank=True, default='')
+    choice_question_answers = models.TextField("选择题答案列表", max_length=1000, blank=True,  default='')
+
+    coding_questions = models.TextField("编程题列表", max_length=1000, blank=True, default='')
+    coding_question_answers = models.TextField("编程题答案列表", max_length=1000, blank=True, default='')
+
+    def start_time_(self):
+        return str(self.start_time)
+    start_time_.short_description = '开考时间'
+
+
+class StudentInfoImporter(models.Model):
+    class Meta:
+        verbose_name = '导入考生信息'
+        verbose_name_plural = '导入考生信息'
+
+    def __str__(self):
+        return '导入考生信息'+str(self.id)
+
+    upload_description_file = models.FileField(upload_to='upload_student_list/', null=True, blank=True, 
+    validators=[validate_txtfile], verbose_name='上传考生信息文件[.txt]')
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  # Call the "real" save() method.
+        print(self.upload_description_file, 'saved')
+        with open(self.upload_description_file.path,'r', encoding='utf-8') as f:
+            lines = [x.strip().replace('\t',' ').split(' ') for x in f.readlines()[:] if len(x)>0]
+            class_name = ''
+            for x in lines:
+                if len(x)==1: 
+                    class_name = x[0]
+                    continue
+                if len(x)>5 and (x[0] !='学号'):
+                    # print(class_name, x[0], x[1])
+                    Student.objects.get_or_create(class_name=class_name, student_id=x[0], student_name=x[1])
+                    # p = Student(class_name=class_name, student_id=x[0], student_name=x[1])
+                    # p.save()
