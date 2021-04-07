@@ -107,7 +107,21 @@
                   </tbody>
                 </table>
     
+                <h2 id="ntfText" >就绪</h2></br>
+                <button type="button" class="btn btn-success" id="btnTerminalSvr">关闭服务器</button>
+
+                <h2 id="serverTime" >就绪</h2></br>
+                <form action="" method="get"> 
+                  您最喜欢水果？<br /><br /> 
+                  <label><input name="Fruit" type="radio" value="" id='choice1'/>苹果 </label> </br>
+                  <label><input name="Fruit" type="radio" value="" id='choice2'/>桃子 </label> </br>
+                  <label><input name="Fruit" type="radio" value="" id='choice3'/>香蕉 </label> </br>
+                  <label><input name="Fruit" type="radio" value="" id='choice4'/>梨 </label> </br>
+                  <label><input name="Fruit" type="radio" value="" />其它 </label> </br>
+                  </form> 
+                  <h2 id="Fruit" >水果</h2></br>
         </div>
+
 
     </div><!-- /.container -->
 
@@ -120,6 +134,62 @@
     <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+
+    <script type="text/javascript">
+      $('#btnTerminalSvr').on('click', function () {
+          $.ajax({
+          url: './handle/choiceanswer',
+          type: 'POST',
+          data: {},
+          dataType: 'json',
+          timeout: 10000,
+          success: function(result) {
+          if ( result.result ) {
+            $("#ntfText").html("服务器时间："+result.result);
+          }else {
+            $("#ntfText").html("重复发起了");
+          }
+          }
+        });
+       });
+      </script>
+
+
+      <script type="text/javascript">
+        $('#choice1').on('click', function () {
+              $("#Fruit").html("choice1");
+        });
+        $('#choice2').on('click', function () {
+              $("#Fruit").html("choice2");
+        });
+        $('#choice3').on('click', function () {
+              $("#Fruit").html("choice3");
+        });
+        $('#choice4').on('click', function () {
+              $("#Fruit").html("choice4");
+        });
+        </script>
+
+       <script type="text/javascript">
+        function refreshTime() {
+          $.ajax({
+            url: './handle/choiceanswer',
+            type: 'POST',
+            data: {},
+            dataType: 'json',
+            timeout: 10000,
+            success: function (result) {
+              if (result.result) {
+                $("#serverTime").html("服务器时间：" + result.result);
+              } else {
+                $("#serverTime").html("重复发起了");
+              }
+            }
+          });
+          setTimeout('refreshTime()', 1000);
+        }
+        setTimeout('refreshTime()', 1000);
+     </script>
 </body>
 
 </html>

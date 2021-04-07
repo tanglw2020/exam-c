@@ -54,7 +54,7 @@ class Exam(models.Model):
     period_.short_description = '考试时长'
 
     def out_link_(self):
-        return format_html('<a href="http://127.0.0.1:8000/c/exam/{}" target="_blank">查看</a>'.format(self.id))
+        return format_html('<a href="/c/exam/{}" target="_blank">查看</a>'.format(self.id))
     out_link_.short_description = '考试情况'
 
 
