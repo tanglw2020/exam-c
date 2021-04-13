@@ -68,18 +68,33 @@
     </div>
   </nav>
 
+
+
   <div class="container">
 
     <div class="card" style="width: 60%;">
       <div class="card-body">
         <h2 class="card-title">考试信息</h2>
-        <p >考生班级： {{ student.class_name }}</p>
-        <p >考生姓名： {{ student.student_name }}</p>
-        <p >考试科目： {{ exam.exam_type_ }} </p>
-        <p >考试时长： {{ exam.period_ }} </p>
-        <p >开始时间： {{ exam_page.start_time }} </p>
+        <p>考生班级： {{ student.class_name }}</p>
+        <p>考生姓名： {{ student.student_name }}</p>
+        <p>考试科目： {{ exam.exam_type_ }} </p>
+        <p>考试时长： {{ exam.period_ }} </p>
+        <p>开始时间： {{ exam_page.start_time }} </p>
       </div>
     </div>
+
+    {{ choice_questions }}
+
+    <code class='c'>
+      #include <stdio.h>
+        int Func(int n)
+        {
+        }
+        int main()
+        {
+        return 0;
+        }
+    </code>
 
     <div class="row">
 
@@ -96,54 +111,54 @@
     </div>
 
 
-    </div><!-- /.container -->
+  </div><!-- /.container -->
 
 
-    <!-- Bootstrap core JavaScript
+  <!-- Bootstrap core JavaScript
     ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
-    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+  <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+  <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
 
 
-    <script type="text/javascript">
-      $('#choice1').on('click', function () {
-        $("#Fruit").html("choice1");
-      });
-      $('#choice2').on('click', function () {
-        $("#Fruit").html("choice2");
-      });
-      $('#choice3').on('click', function () {
-        $("#Fruit").html("choice3");
-      });
-      $('#choice4').on('click', function () {
-        $("#Fruit").html("choice4");
-      });
-    </script>
+  <script type="text/javascript">
+    $('#choice1').on('click', function () {
+      $("#Fruit").html("choice1");
+    });
+    $('#choice2').on('click', function () {
+      $("#Fruit").html("choice2");
+    });
+    $('#choice3').on('click', function () {
+      $("#Fruit").html("choice3");
+    });
+    $('#choice4').on('click', function () {
+      $("#Fruit").html("choice4");
+    });
+  </script>
 
-    <script type="text/javascript">
-      function refreshTime() {
-        $.ajax({
-          url: './handle/choiceanswer',
-          type: 'POST',
-          data: {},
-          dataType: 'json',
-          timeout: 10000,
-          success: function (result) {
-            if (result.result) {
-              $("#serverTime").html("服务器时间：" + result.result);
-            } else {
-              $("#serverTime").html("重复发起了");
-            }
+  <script type="text/javascript">
+    function refreshTime() {
+      $.ajax({
+        url: './handle/choiceanswer',
+        type: 'POST',
+        data: {},
+        dataType: 'json',
+        timeout: 10000,
+        success: function (result) {
+          if (result.result) {
+            $("#serverTime").html("服务器时间：" + result.result);
+          } else {
+            $("#serverTime").html("重复发起了");
           }
-        });
-        setTimeout('refreshTime()', 1000);
-      }
+        }
+      });
       setTimeout('refreshTime()', 1000);
-    </script>
+    }
+    setTimeout('refreshTime()', 1000);
+  </script>
 </body>
 
 </html>

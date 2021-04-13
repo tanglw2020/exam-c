@@ -27,10 +27,16 @@ def exampage(request, exampage_id):
 
     exam = exam_page.exam
     student = exam_page.student
+    choice_question_ids = [int(x) for x in exam_page.choice_questions.split(',') if len(x)]
+    choice_questions = []
+    for i in choice_question_ids:
+        choice_questions.append(ChoiceQuestion.objects.get(pk=i))
+
     context = {
         'exam': exam,
         'student': student,
         'exam_page': exam_page,
+        'choice_questions': choice_questions
         }
     return render(request, 'exam_c/exam_page.html', context)
 
