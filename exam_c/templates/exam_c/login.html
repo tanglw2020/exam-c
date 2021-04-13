@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>考生登录页面</title>
+    <style type="text/css">
+        .login {
+            height: 80%;
+            padding: 15px 16px;
+            background-color: cadetblue;
+            text-align: center;
+        }
+
+        .login h1 {
+            text-align: center;
+            color: darkgreen;
+        }
+
+        .login .form-row {
+            padding: 3px 0;
+            float: left;
+            width: 100%;
+            border-bottom: none;
+        }
+
+        .login .form-row label {
+            padding-right: 0.5em;
+            line-height: 2em;
+            font-size: 1em;
+            clear: both;
+            color: rgb(83, 75, 75);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login">
+        <h2>欢迎登陆</h2>
+        <h1>C语言考试系统</h1>
+        <form action="{% url 'c:login' %}" method="POST">
+            {% csrf_token %}
+            {{ form.non_field_errors }}
+            <div class="form-row">
+                {% include "exam_c/form_item.html" with form_item=form.exam_id %}
+            </div>
+            <div class="form-row">
+                {% include "exam_c/form_item.html" with form_item=form.name %}
+            </div>
+            <div class="form-row">
+                {% include "exam_c/form_item.html" with form_item=form.student_id %}
+            </div>
+
+            <input type="submit" value="登录" class="login-submit">
+        </form>
+    </div>
+</body>
+
+</html>

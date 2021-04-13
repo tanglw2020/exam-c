@@ -71,8 +71,10 @@
     <div class="jumbotron">
       <div class="container">
         <h1>{{ exam.exam_type_ }}<small>在线考试系统</small></h1>
+        <p>考试编号: {{ exam.id }} <strong>|请将此编号告知考生|</strong></p>
         <p>考试时长: {{ exam.period_ }}</p>
         <p>考试人数: {{ exam_papers.count }}</p>
+
         <!-- <p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a></p> -->
       </div>
     </div>
