@@ -9,6 +9,7 @@ from django.http import Http404
 from django.views.decorators.csrf import csrf_exempt
 import json
 import datetime
+import time
 
 from .models import *
 from .forms import StudentForm
@@ -23,7 +24,7 @@ def exampage(request, exampage_id):
     try:
         exam_page = ExamPaper.objects.get(id=exampage_id)
     except ExamPaper.DoesNotExist:
-        raise Http404("exam page {} does not exist".format(exampage_id))
+        return HttpResponseRedirect(reverse('c:login'))
 
     exam = exam_page.exam
     student = exam_page.student
@@ -103,13 +104,28 @@ def login(request):
     return render(request, 'exam_c/login.html', context)
 
 
+@csrf_exempt
+def api_choiceanswer(request, exampage_id):
 
+    try:
+        exam_page = ExamPaper.objects.get(id=exampage_id)
+    except ExamPaper.DoesNotExist:
+        raise Http404("exam page {} does not exist".format(exampage_id))
+    return HttpResponse(json.dumps(a), content_type='application/json')
 
 
 @csrf_exempt
-def handle_choice_ans_change(request):
+def api_get_server_time(request, exampage_id):
 
-    time = datetime.datetime.now()
+    try:
+        exam_page = ExamPaper.objects.get(id=exampage_id)
+    except ExamPaper.DoesNotExist:
+        a = {"result":"null"}
+        return HttpResponse(json.dumps(a), content_type='application/json')
+
+    diff = int(datetime.datetime.now().timestamp() - exam_page.start_time.timestamp())
+    diff = diff
+
     a = {}
-    a["result"] = str(time) ##"post_success"
+    a["result"] = str(diff)  ##"post_success"
     return HttpResponse(json.dumps(a), content_type='application/json')

@@ -8,5 +8,6 @@ urlpatterns = [
     path('login', views.login, name='login'),
     path('exampage/<int:exampage_id>', views.exampage, name='exampage'),
     path('examroom/<int:exam_id>', views.exam_room, name='examroom'),
-    path(r'handle/choiceanswer', views.handle_choice_ans_change,name='handle-choiceanswer'),
+    path('api/choiceanswer', views.api_choiceanswer,name='api-choiceanswer'),
+    path('api/getservertime/<int:exampage_id>', views.api_get_server_time,name='api-getservertime'),
 ]

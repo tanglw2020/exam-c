@@ -138,7 +138,7 @@
     <script type="text/javascript">
       $('#btnTerminalSvr').on('click', function () {
           $.ajax({
-          url: './handle/choiceanswer',
+          url: './api/getservertime',
           type: 'POST',
           data: {},
           dataType: 'json',
@@ -173,7 +173,7 @@
        <script type="text/javascript">
         function refreshTime() {
           $.ajax({
-            url: './handle/choiceanswer',
+            url: './api/getservertime',
             type: 'POST',
             data: {},
             dataType: 'json',

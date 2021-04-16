@@ -85,19 +85,7 @@
 
     {{ choice_questions }}
 
-    <code class='c'>
-      #include <stdio.h>
-        int Func(int n)
-        {
-        }
-        int main()
-        {
-        return 0;
-        }
-    </code>
-
     <div class="row">
-
       <div class="col-md-6">
         <form action="" method="post">
           您最喜欢水果？<br /><br />
@@ -107,12 +95,11 @@
           <label><input name="Fruit" type="radio" value="" id='choice4' />梨 </label> </br>
         </form>
         <h2 id="Fruit">水果</h2></br>
+        <h2 id="serverTime">水果</h2></br>
       </div>
     </div>
 
-
   </div><!-- /.container -->
-
 
   <!-- Bootstrap core JavaScript
     ================================================== -->
@@ -122,7 +109,6 @@
   <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
   <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
   <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
-
 
   <script type="text/javascript">
     $('#choice1').on('click', function () {
@@ -141,8 +127,9 @@
 
   <script type="text/javascript">
     function refreshTime() {
+      // var exam_page_id = exam_page.id; 
       $.ajax({
-        url: './handle/choiceanswer',
+        url: '/c/api/getservertime/{{ exam_page.id }}',
         type: 'POST',
         data: {},
         dataType: 'json',
