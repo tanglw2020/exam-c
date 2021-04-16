@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, FileResponse
 from django.urls import reverse
 from django import forms
 from django.http import Http404
@@ -129,3 +129,29 @@ def api_get_server_time(request, exampage_id):
     a = {}
     a["result"] = str(diff)  ##"post_success"
     return HttpResponse(json.dumps(a), content_type='application/json')
+
+
+def api_download_scorelist(request, exam_id):
+    try:
+        exam = Exam.objects.get(id=exam_id)
+    except Exam.DoesNotExist:
+        raise Http404("exam does not exist")
+
+    exam_papers = exam.exampaper_set.all()
+    line_head ="#,班级,姓名,学号,开考时间"
+    lines = [line_head]
+    for i,exam_paper in enumerate(exam_papers):
+        one_line = ','.join([str(i), exam_paper.student.class_name, exam_paper.student.student_name, 
+        exam_paper.student.student_id, exam_paper.start_time_()])
+        # print(one_line)
+        lines.append(one_line)
+    
+    file_path = 'media/temp_scorelist/scorelist{}.txt'.format(exam_id)
+    with open(file_path, 'w', encoding='utf-8') as f:
+        for line in lines:
+            f.write(line+'\n')
+
+    response = FileResponse(open(file_path, 'rb'))
+    response['Content-Type'] = 'application/octet-stream'
+    response['Content-Disposition'] = 'attachment;filename="scorelist{}.txt"'.format(exam_id)
+    return response

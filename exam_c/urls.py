@@ -10,4 +10,5 @@ urlpatterns = [
     path('examroom/<int:exam_id>', views.exam_room, name='examroom'),
     path('api/choiceanswer', views.api_choiceanswer,name='api-choiceanswer'),
     path('api/getservertime/<int:exampage_id>', views.api_get_server_time,name='api-getservertime'),
+    path('api/download/scorelist<int:exam_id>.txt', views.api_download_scorelist, name='api-download-scorelist'),
 ]
