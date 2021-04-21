@@ -173,9 +173,7 @@ class CodingQuestion(models.Model):
     validators=[validate_txtfile], verbose_name='上传题目输出[.txt文件]')
 
     def question_html_(self):
-        # print(self.upload_description_file, type(self.upload_description_file))
         try:
-        # if self.upload_description_file is not None:
             with open(self.upload_description_file.path,'r', encoding='utf-8') as f:
                 lines = f.readlines()
                 return format_html_join(
@@ -183,14 +181,10 @@ class CodingQuestion(models.Model):
                         (('black', x) for x in lines)
                         )
         except:
-        # else:
             return ''
-        # return ''
     question_html_.short_description = '题目'
 
-
     def code_html_(self):
-        # if self.upload_c_file is not None:
         try:
             with open(self.upload_c_file.path,'r', encoding='utf-8') as f:
                 lines = f.readlines()
@@ -203,6 +197,12 @@ class CodingQuestion(models.Model):
             return ''
         # return ''
     code_html_.short_description = '代码'
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  
+        with open(self.upload_description_file.path,'r', encoding='utf-8') as f:
+            self.question_text = f.readlines()
+
 
 
 # class CompletionQuestion(models.Model):
