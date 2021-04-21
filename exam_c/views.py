@@ -10,6 +10,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 import datetime
 import time
+import random
 
 from .models import *
 from .forms import StudentForm
@@ -86,10 +87,9 @@ def login(request):
                 exam_paper.start_time = datetime.datetime.now()
 
                 choice_questions_ids = [str(x['id']) for x in ChoiceQuestion.objects.values('id')]
-                choice_questions_ids = choice_questions_ids[:choice_question_numb]
+                choice_questions_ids = random.sample(choice_questions_ids, choice_question_numb)
                 exam_paper.choice_questions = ','.join(choice_questions_ids)
                 exam_paper.choice_question_answers = ','.join(['+' for i in range(len(choice_questions_ids))])
-                # print('choice_questions_ids', choice_questions_ids)
                 exam_paper.save()
             else:
                 exam_paper = ExamPaper.objects.get(student=student, exam=exam)
@@ -124,10 +124,8 @@ def api_get_server_time(request, exampage_id):
         return HttpResponse(json.dumps(a), content_type='application/json')
 
     diff = int(datetime.datetime.now().timestamp() - exam_page.start_time.timestamp())
-    diff = diff
-
     a = {}
-    a["result"] = str(diff)  ##"post_success"
+    a["result"] = str(int(diff/60))+'min'+str(diff%60)+'s'  ##"post_success"
     return HttpResponse(json.dumps(a), content_type='application/json')
 
 
