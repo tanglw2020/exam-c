@@ -97,6 +97,18 @@ def exampage_coding_question(request, exampage_id, coding_question_id):
         }
     return render(request, 'exam_c/exam_page_coding_question.html', context)
 
+
+
+import socket
+def get_host_ip():
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(('8.8.8.8', 80))
+        ip = s.getsockname()[0]
+    finally:
+        s.close()
+    return ip
+
 def exam_room(request, exam_id):
     try:
         exam = Exam.objects.get(id=exam_id)
@@ -110,6 +122,7 @@ def exam_room(request, exam_id):
         'exam': exam,
         'exam_id': exam_id,
         'exam_papers': exam_papers,
+        'login_url': get_host_ip()+':8000/c/login',
         }
     return render(request, 'exam_c/exam_room_detail.html', context)
 
