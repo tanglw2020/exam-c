@@ -58,9 +58,9 @@
       </div>
       <div id="navbar" class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
-          <li class="active"><a href="{% url 'c:exampage'  exam_page.id %}">首页</a></li>
+          <li><a href="{% url 'c:exampage'  exam_page.id %}">首页</a></li>
           <li><a href="{% url 'c:exampage-choicequestion'  exam_page.id  1 %}">选择题</a></li>
-          <li><a href="{% url 'c:exampage-codingquestion'  exam_page.id  1 %}">编程题</a></li>
+          <li  class="active"><a href="{% url 'c:exampage-codingquestion'  exam_page.id  1 %}">编程题</a></li>
         </ul>
       </div>
       <!--/.nav-collapse -->
@@ -83,19 +83,7 @@
       </div>
     </div>
 
-    <div class="card" style="width: 60%;">
-      <div class="card-body">
-        <h2 class="card-title">选择题</h2>
-        <div id="navbar" class="collapse navbar-collapse">
-          <ul class="nav navbar-nav">
-          {% for _ in choice_questions_answers %}
-          <li class="list-group-item"><a href="{% url 'c:exampage-choicequestion'  exam_page.id  forloop.counter %}">题{{ forloop.counter }}</a></li>
-          {% endfor %}
-        </ul>
-      </div>
-    </div>
-    </div>
-
+    
     <div class="card" style="width: 60%;">
       <div class="card-body">
         <h2 class="card-title">编程题</h2>
@@ -109,6 +97,15 @@
     </div>
     </div>
 
+
+    <div class="row">
+      <div class="col-md-6">
+        <p>第{{ coding_question_id }}题： {{ coding_question.question_html_ }}</p>
+        <p>{{ coding_questions_answers }} </p>
+      </div>
+    </div>
+
+
   </div><!-- /.container -->
 
   <!-- Bootstrap core JavaScript
@@ -120,27 +117,41 @@
   <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
   <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
 
-
-<script type="text/javascript">
-  function refreshTime() {
-    $.ajax({
-      url: '/c/api/getservertime/{{ exam_page.id }}',
-      type: 'POST',
-      data: {},
-      dataType: 'json',
-      timeout: 10000,
-      success: function (result) {
-        if (result.result) {
-          $("#serverTime").html("考试用时：" + result.result);
-        } else {
-          $("#serverTime").html("无效数据");
-        }
-      }
+  <script type="text/javascript">
+    $('#choice1').on('click', function () {
+      $("#Fruit").html("choice1");
     });
+    $('#choice2').on('click', function () {
+      $("#Fruit").html("choice2");
+    });
+    $('#choice3').on('click', function () {
+      $("#Fruit").html("choice3");
+    });
+    $('#choice4').on('click', function () {
+      $("#Fruit").html("choice4");
+    });
+  </script>
+
+  <script type="text/javascript">
+    function refreshTime() {
+      $.ajax({
+        url: '/c/api/getservertime/{{ exam_page.id }}',
+        type: 'POST',
+        data: {},
+        dataType: 'json',
+        timeout: 10000,
+        success: function (result) {
+          if (result.result) {
+            $("#serverTime").html("考试用时：" + result.result);
+          } else {
+            $("#serverTime").html("无效数据");
+          }
+        }
+      });
+      setTimeout('refreshTime()', 1000);
+    }
     setTimeout('refreshTime()', 1000);
-  }
-  setTimeout('refreshTime()', 1000);
-</script>
+  </script>
 </body>
 
 </html>

@@ -50,6 +50,52 @@ def exampage(request, exampage_id):
         }
     return render(request, 'exam_c/exam_page.html', context)
 
+def exampage_choice_question(request, exampage_id, choice_question_id):
+    try:
+        exam_page = ExamPaper.objects.get(id=exampage_id)
+    except ExamPaper.DoesNotExist:
+        return HttpResponseRedirect(reverse('c:login'))
+
+    exam = exam_page.exam
+    student = exam_page.student
+
+    choice_question_database_id = int(exam_page.choice_questions.split(',')[choice_question_id-1])
+    choice_question = ChoiceQuestion.objects.get(pk=choice_question_database_id)
+
+    context = {
+        'exam': exam,
+        'student': student,
+        'exam_page': exam_page,
+        'choice_question': choice_question,
+        'choice_question_id': choice_question_id,
+        'choice_questions_answers': exam_page.choice_question_answers.split(','),
+        'coding_questions_answers': exam_page.coding_question_answers.split(','),
+        }
+    return render(request, 'exam_c/exam_page_choice_question.html', context)
+
+
+def exampage_coding_question(request, exampage_id, coding_question_id):
+    try:
+        exam_page = ExamPaper.objects.get(id=exampage_id)
+    except ExamPaper.DoesNotExist:
+        return HttpResponseRedirect(reverse('c:login'))
+
+    exam = exam_page.exam
+    student = exam_page.student
+
+    coding_question_database_id = int(exam_page.coding_questions.split(',')[coding_question_id-1])
+    coding_question = CodingQuestion.objects.get(pk=coding_question_database_id)
+
+    context = {
+        'exam': exam,
+        'student': student,
+        'exam_page': exam_page,
+        'coding_question': coding_question,
+        'coding_question_id': coding_question_id,
+        'choice_questions_answers': exam_page.choice_question_answers.split(','),
+        'coding_questions_answers': exam_page.coding_question_answers.split(','),
+        }
+    return render(request, 'exam_c/exam_page_coding_question.html', context)
 
 def exam_room(request, exam_id):
     try:
@@ -140,7 +186,7 @@ def api_get_server_time(request, exampage_id):
 
     diff = int(datetime.datetime.now().timestamp() - exam_page.start_time.timestamp())
     a = {}
-    a["result"] = str(int(diff/60))+'min'+str(diff%60)+'s'  ##"post_success"
+    a["result"] = str(int(diff/60))+'分钟'+str(diff%60)+'秒'  ##"post_success"
     return HttpResponse(json.dumps(a), content_type='application/json')
 
 
