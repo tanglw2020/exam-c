@@ -166,16 +166,6 @@ def login(request):
 
 
 @csrf_exempt
-def api_choiceanswer(request, exampage_id):
-
-    try:
-        exam_page = ExamPaper.objects.get(id=exampage_id)
-    except ExamPaper.DoesNotExist:
-        raise Http404("exam page {} does not exist".format(exampage_id))
-    return HttpResponse(json.dumps(a), content_type='application/json')
-
-
-@csrf_exempt
 def api_get_server_time(request, exampage_id):
 
     try:
@@ -189,6 +179,20 @@ def api_get_server_time(request, exampage_id):
     a["result"] = str(int(diff/60))+'分钟'+str(diff%60)+'秒'  ##"post_success"
     return HttpResponse(json.dumps(a), content_type='application/json')
 
+@csrf_exempt
+def api_handle_choice_answer(request, exampage_id, choice_question_id, choice_id):
+
+    try:
+        exam_page = ExamPaper.objects.get(id=exampage_id)
+    except ExamPaper.DoesNotExist:
+        a = {"result":"null"}
+        return HttpResponse(json.dumps(a), content_type='application/json')
+    old_answers = exam_page.choice_question_answers.split(',')
+    old_answers[choice_question_id-1] = str(choice_id)
+    exam_page.choice_question_answers = ','.join(old_answers)
+    exam_page.save()
+    a = {}
+    return HttpResponse(json.dumps(a), content_type='application/json')
 
 def api_download_scorelist(request, exam_id):
     try:

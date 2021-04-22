@@ -73,7 +73,7 @@
 
     <div class="card" style="width: 60%;">
       <div class="card-body">
-        <h2 class="card-title">考试信息</h2>
+        <p></p>
         <p>考生班级： {{ student.class_name }}</p>
         <p>考生姓名： {{ student.student_name }}</p>
         <p>考试科目： {{ exam.exam_type_ }} </p>
@@ -89,8 +89,11 @@
         <h2 class="card-title">编程题</h2>
             <div class="btn-group" role="group" aria-label="coding questions">
             {% for a in coding_questions_answers %}
-            {% if a == '+' %}
+            {% if forloop.counter == choice_question_id %}
             <a class="btn btn-primary"
+            href="{% url 'c:exampage-codingquestion'  exam_page.id  forloop.counter %}">题{{ forloop.counter }}</a></li>
+            {% elif a == '+' %}
+            <a class="btn btn-light"
                 href="{% url 'c:exampage-codingquestion'  exam_page.id  forloop.counter %}">题{{ forloop.counter }}</a></li>
             {% else %}
             <a class="btn btn-success"
