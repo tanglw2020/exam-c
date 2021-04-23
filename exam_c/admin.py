@@ -9,7 +9,7 @@ class ChoiceQuestionAdmin(admin.ModelAdmin):
 
 
 class CodingQuestionAdmin(admin.ModelAdmin):
-        list_display = ('__str__', 'question_text', 'question_html_', 'code_html_','problem_type')
+        list_display = ('__str__', 'question_text', 'question_html_', 'code_html_','problem_type', 'zip_path_')
         list_display_links = ('question_text',)
 
 

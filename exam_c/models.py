@@ -6,6 +6,9 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html, format_html_join
 import re
+import os
+import shutil
+import zipfile
 # Create your models here.
 
 EXAM_TYPE_CHOICES = [
@@ -198,10 +201,26 @@ class CodingQuestion(models.Model):
         # return ''
     code_html_.short_description = '代码'
 
+    def zip_path_(self):
+        try:
+            c_path, input_path = self.upload_c_file.path, self.upload_input_file.path
+            paths = os.path.split(input_path)
+            return os.path.sep.join([paths[0], 'coding-'+str(self.id)+'.zip'])
+        except:
+            return ''
+    zip_path_.short_description = '压缩文件'
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)  
-        with open(self.upload_description_file.path,'r', encoding='utf-8') as f:
-            self.question_text = f.readlines()
+        zip_path = self.zip_path_()
+        if zip_path:
+            if os.path.exists(zip_path): os.remove(zip_path)
+            c_path, input_path = self.upload_c_file.path, self.upload_input_file.path
+            print(zip_path)
+            zf = zipfile.ZipFile(zip_path, 'w')
+            zf.write(c_path,'main.c')
+            zf.write(input_path,'input.txt')
+            zf.close()
 
 
 

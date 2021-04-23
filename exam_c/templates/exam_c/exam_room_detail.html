@@ -71,43 +71,38 @@
     <div class="jumbotron">
       <div class="container">
         <h1>{{ exam.exam_type_ }}<small>在线考试系统</small></h1>
-        <p>考试编号: {{ exam.id }} </p>
         <p>考试登陆网址: {{ login_url }} </p>
+        <p>考试编号: {{ exam.id }} </p>
         <p>考试时长: {{ exam.period_ }}</p>
         <p>考试人数: {{ exam_papers.count }}</p>
-        <p><strong>|请将考试编号和考试登陆网址告知考生|</strong></p>
+        <p><strong>|请将考试登陆网址和考试编号告知考生|</strong></p>
       </div>
     </div>
 
     <div class="container">
     
       <div class="starter-template">
-        <h1>考生列表 <small><a href="{% url 'c:api-download-scorelist' exam_id %}">导出成绩</a></small></h1>
+        <h1>考生列表 <a type="button" class="btn btn-info" href="{% url 'c:api-download-scorelist' exam_id %}">导出成绩</a></h1>
     
-            
-            <table class="table table-striped">
-              <thead>
-                <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">班级</th>
-                  <th scope="col">姓名</th>
-                  <th scope="col">学号</th>
-                  <th scope="col">开考时间</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for exam_paper in exam_papers %}
-                <tr>
-                  <th scope="row">{{ forloop.counter }}</th>
-                  <td>{{ exam_paper.student.class_name }}</td>
-                  <td>{{ exam_paper.student.student_name }}</td>
-                  <td>{{ exam_paper.student.student_id }}</td>
-                  <td>{{ exam_paper.start_time_ }}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-    
+        <table class="table table-striped table-bordered">
+            <tr >
+              <th >#</th>
+              <td >班级</td>
+              <td >姓名</td>
+              <td >学号</td>
+              <td >开考时间</td>
+            </tr>
+            {% for exam_paper in exam_papers %}
+            <tr>
+              <th scope="row">{{ forloop.counter }}</th>
+              <td>{{ exam_paper.student.class_name }}</td>
+              <td>{{ exam_paper.student.student_name }}</td>
+              <td>{{ exam_paper.student.student_id }}</td>
+              <td>{{ exam_paper.start_time_ }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
       </div>
     
       </div><!-- /.container -->
