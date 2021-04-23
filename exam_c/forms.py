@@ -25,3 +25,5 @@ class StudentForm(forms.Form):
             # if exam.pub_date < timezone.now() - datetime.timedelta(days=1):
             #     self.add_error('exam_id', '考试编号不是当天的')
         
+class UploadOutputFileForm(forms.Form):
+    file = forms.FileField()

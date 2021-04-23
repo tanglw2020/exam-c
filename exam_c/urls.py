@@ -13,4 +13,5 @@ urlpatterns = [
     path('api/sendchoiceanswer/<int:exampage_id>/<int:choice_question_id>/<int:choice_id>', views.api_handle_choice_answer,name='api-choiceanswer'),
     path('api/getservertime/<int:exampage_id>', views.api_get_server_time,name='api-getservertime'),
     path('api/download/scorelist<int:exam_id>.txt', views.api_download_scorelist, name='api-download-scorelist'),
+    path('api/download/codingzip/<int:exampage_id>/<int:coding_question_id>', views.api_download_coding_zipfile, name='api-download-coding-zipfile'),
 ]

@@ -111,6 +111,19 @@
         <p>{{ coding_questions_answers }} </p>
     </div>
 
+    <HR style= " FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )" width ="100%" color =#987 cb 9 SIZE = 20>
+    <div>
+      <a type="button" class="btn btn-info" href="{% url 'c:api-download-coding-zipfile'  exam_page.id  coding_question_id %}">下载题目ZIP文件</a>
+    </div>
+
+    <HR style= " FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )" width ="100%" color =#987 cb 9 SIZE = 20>
+      <div>
+        <form method='POST' action='' enctype='multipart/form-data'>
+          {% csrf_token %}
+          {{ form.as_p }}
+          <input type="submit" value="上传结果文件" name="">
+      </form>
+      </div>
 
   </div><!-- /.container -->
 

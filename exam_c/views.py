@@ -13,7 +13,7 @@ import time
 import random
 
 from .models import *
-from .forms import StudentForm
+from .forms import StudentForm, UploadOutputFileForm
 # Create your views here.
 
 def index(request):
@@ -74,6 +74,12 @@ def exampage_choice_question(request, exampage_id, choice_question_id):
     return render(request, 'exam_c/exam_page_choice_question.html', context)
 
 
+def handle_uploaded_file(f, root_path, filename='name.txt'):
+    # print(os.path.join(root_path,filename))
+    with open(os.path.join(root_path,filename), 'wb') as destination:
+        for chunk in f.chunks():
+            destination.write(chunk)
+
 def exampage_coding_question(request, exampage_id, coding_question_id):
     try:
         exam_page = ExamPaper.objects.get(id=exampage_id)
@@ -85,6 +91,14 @@ def exampage_coding_question(request, exampage_id, coding_question_id):
 
     coding_question_database_id = int(exam_page.coding_questions.split(',')[coding_question_id-1])
     coding_question = CodingQuestion.objects.get(pk=coding_question_database_id)
+    root_path = os.path.split(coding_question.zip_path_())[0]
+    if request.method == 'POST':
+        form = UploadOutputFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            handle_uploaded_file(request.FILES['file'], root_path, filename='coding_output_{}_{}.txt'.format(exampage_id, coding_question_id))
+            # return HttpResponseRedirect('/success/url/')
+    else:
+        form = UploadOutputFileForm()
 
     context = {
         'exam': exam,
@@ -94,6 +108,7 @@ def exampage_coding_question(request, exampage_id, coding_question_id):
         'coding_question_id': coding_question_id,
         'choice_questions_answers': exam_page.choice_question_answers.split(','),
         'coding_questions_answers': exam_page.coding_question_answers.split(','),
+        'form': form,
         }
     return render(request, 'exam_c/exam_page_coding_question.html', context)
 
@@ -231,3 +246,26 @@ def api_download_scorelist(request, exam_id):
     response['Content-Type'] = 'application/octet-stream'
     response['Content-Disposition'] = 'attachment;filename="scorelist{}.txt"'.format(exam_id)
     return response
+
+
+@csrf_exempt
+def api_download_coding_zipfile(request, exampage_id, coding_question_id):
+
+    try:
+        exam_page = ExamPaper.objects.get(id=exampage_id)
+    except ExamPaper.DoesNotExist:
+        a = {"result":"null"}
+        return HttpResponse(json.dumps(a), content_type='application/json')
+    
+    coding_question_database_id = int(exam_page.coding_questions.split(',')[coding_question_id-1])
+    coding_question = CodingQuestion.objects.get(pk=coding_question_database_id)
+
+    file_path = coding_question.zip_path_()
+    if file_path:
+        response = FileResponse(open(file_path, 'rb'))
+        response['Content-Type'] = 'application/octet-stream'
+        response['Content-Disposition'] = 'attachment;filename="coding{}.zip"'.format(coding_question_id)
+        return response
+    else:
+        a = {"result":"null"}
+        return HttpResponse(json.dumps(a), content_type='application/json')
