@@ -9,7 +9,11 @@ import re
 import os
 import shutil
 import zipfile
+from pathlib import Path
 # Create your models here.
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+MEDIA_ROOT  = BASE_DIR / 'media'
 
 EXAM_TYPE_CHOICES = [
     ('1','C语言'),
@@ -302,6 +306,46 @@ class ExamPaper(models.Model):
     def start_time_(self):
         return str(self.start_time)
     start_time_.short_description = '开考时间'
+
+    def coding_question_answers_(self):
+        return self.coding_question_answers.split(',')
+    coding_question_answers_.short_description = '编程题答案'
+
+    def choice_question_answers_(self):
+        return self.choice_question_answers.split(',')
+    choice_question_answers_.short_description = '选择题答案'
+
+    def choice_questions_all_(self):
+        choice_question_ids = [int(x) for x in self.choice_questions.split(',') if len(x)]
+        choice_questions_all = []
+        for i in choice_question_ids:
+            choice_questions_all.append(ChoiceQuestion.objects.get(pk=i))
+        return choice_questions_all
+    choice_questions_all_.short_description = '全部选择题'
+
+    def coding_questions_all_(self):
+        coding_question_ids = [int(x) for x in self.coding_questions.split(',') if len(x)]
+        coding_questions_all = []
+        for i in coding_question_ids:
+            coding_questions_all.append(CodingQuestion.objects.get(pk=i))
+        return coding_questions_all
+    coding_questions_all_.short_description = '全部编程题'
+
+    ## question_id start from 1 to n
+    def choice_questions_pk_(self, question_id):
+        question_database_id = int(self.choice_questions.split(',')[question_id-1])
+        return ChoiceQuestion.objects.get(pk=question_database_id)
+    choice_questions_pk_.short_description = 'pk选择题'
+
+    def coding_questions_pk_(self, question_id):
+        question_database_id = int(self.coding_questions.split(',')[question_id-1])
+        return CodingQuestion.objects.get(pk=question_database_id)
+    coding_questions_pk_.short_description = 'pk编程题'
+
+    def coding_output_path_(self, question_id):
+        output_save_path = os.path.join(MEDIA_ROOT, 'upload_output','coding_output_{}_{}.txt'.format(self.id, question_id))
+        return output_save_path
+    coding_output_path_.short_description = '上传结果保存目录'
 
 
 class StudentInfoImporter(models.Model):

@@ -89,7 +89,7 @@
         <h2 class="card-title">编程题</h2>
             <div class="btn-group" role="group" aria-label="coding questions">
             {% for a in coding_questions_answers %}
-            {% if forloop.counter == choice_question_id %}
+            {% if forloop.counter == coding_question_id %}
             <a class="btn btn-primary"
             href="{% url 'c:exampage-codingquestion'  exam_page.id  forloop.counter %}">题{{ forloop.counter }}</a></li>
             {% elif a == '+' %}
@@ -121,7 +121,7 @@
         <form method='POST' action='' enctype='multipart/form-data'>
           {% csrf_token %}
           {{ form.as_p }}
-          <input type="submit" value="上传结果文件" name="">
+          <input type="submit" class="btn btn-info" value="上传结果文件" name="">
       </form>
       </div>
 
@@ -136,21 +136,7 @@
   <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
   <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
 
-  <script type="text/javascript">
-    $('#choice1').on('click', function () {
-      $("#Fruit").html("choice1");
-    });
-    $('#choice2').on('click', function () {
-      $("#Fruit").html("choice2");
-    });
-    $('#choice3').on('click', function () {
-      $("#Fruit").html("choice3");
-    });
-    $('#choice4').on('click', function () {
-      $("#Fruit").html("choice4");
-    });
-  </script>
-
+  
   <script type="text/javascript">
     function refreshTime() {
       $.ajax({

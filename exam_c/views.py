@@ -11,10 +11,14 @@ import json
 import datetime
 import time
 import random
+from pathlib import Path
 
 from .models import *
 from .forms import StudentForm, UploadOutputFileForm
 # Create your views here.
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+MEDIA_ROOT  = BASE_DIR / 'media'
 
 def index(request):
     exam_list = Exam.objects.all()
@@ -27,26 +31,20 @@ def exampage(request, exampage_id):
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('c:login'))
 
-    exam = exam_page.exam
-    student = exam_page.student
-    choice_question_ids = [int(x) for x in exam_page.choice_questions.split(',') if len(x)]
-    choice_questions = []
-    for i in choice_question_ids:
-        choice_questions.append(ChoiceQuestion.objects.get(pk=i))
+    # coding_question_ids = [int(x) for x in exam_page.coding_questions.split(',') if len(x)]
+    # coding_questions = []
+    # for i in coding_question_ids:
+    #     coding_questions.append(CodingQuestion.objects.get(pk=i))
 
-    coding_question_ids = [int(x) for x in exam_page.coding_questions.split(',') if len(x)]
-    coding_questions = []
-    for i in coding_question_ids:
-        coding_questions.append(CodingQuestion.objects.get(pk=i))
+    # 'choice_questions': exam_page.choice_questions_all_(),
+    # 'coding_questions': coding_questions,
 
     context = {
-        'exam': exam,
-        'student': student,
+        'exam': exam_page.exam,
+        'student': exam_page.student,
         'exam_page': exam_page,
-        'choice_questions': choice_questions,
-        'coding_questions': coding_questions,
-        'choice_questions_answers': exam_page.choice_question_answers.split(','),
-        'coding_questions_answers': exam_page.coding_question_answers.split(','),
+        'choice_questions_answers': exam_page.choice_question_answers_(),
+        'coding_questions_answers': exam_page.coding_question_answers_(),
         }
     return render(request, 'exam_c/exam_page.html', context)
 
@@ -56,27 +54,21 @@ def exampage_choice_question(request, exampage_id, choice_question_id):
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('c:login'))
 
-    exam = exam_page.exam
-    student = exam_page.student
-
-    choice_question_database_id = int(exam_page.choice_questions.split(',')[choice_question_id-1])
-    choice_question = ChoiceQuestion.objects.get(pk=choice_question_database_id)
-
     context = {
-        'exam': exam,
-        'student': student,
+        'exam': exam_page.exam,
+        'student': exam_page.student,
         'exam_page': exam_page,
-        'choice_question': choice_question,
+        'choice_questions_answers': exam_page.choice_question_answers_(),
+        'coding_questions_answers': exam_page.coding_question_answers_(),
+        'choice_question': exam_page.choice_questions_pk_(choice_question_id),
         'choice_question_id': choice_question_id,
-        'choice_questions_answers': exam_page.choice_question_answers.split(','),
-        'coding_questions_answers': exam_page.coding_question_answers.split(','),
         }
     return render(request, 'exam_c/exam_page_choice_question.html', context)
 
 
-def handle_uploaded_file(f, root_path, filename='name.txt'):
+def handle_uploaded_file(f, output_save_path):
     # print(os.path.join(root_path,filename))
-    with open(os.path.join(root_path,filename), 'wb') as destination:
+    with open(output_save_path, 'wb') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
 
@@ -86,28 +78,28 @@ def exampage_coding_question(request, exampage_id, coding_question_id):
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('c:login'))
 
-    exam = exam_page.exam
-    student = exam_page.student
-
-    coding_question_database_id = int(exam_page.coding_questions.split(',')[coding_question_id-1])
-    coding_question = CodingQuestion.objects.get(pk=coding_question_database_id)
-    root_path = os.path.split(coding_question.zip_path_())[0]
+    coding_question = exam_page.coding_questions_pk_(coding_question_id)
     if request.method == 'POST':
         form = UploadOutputFileForm(request.POST, request.FILES)
         if form.is_valid():
-            handle_uploaded_file(request.FILES['file'], root_path, filename='coding_output_{}_{}.txt'.format(exampage_id, coding_question_id))
-            # return HttpResponseRedirect('/success/url/')
+            output_save_path = exam_page.coding_output_path_(coding_question_id)
+            handle_uploaded_file(request.FILES['file'], output_save_path)
+            ## update coding answers
+            old_answers = exam_page.coding_question_answers.split(',')
+            old_answers[coding_question_id-1] = str(output_save_path)
+            exam_page.coding_question_answers = ','.join(old_answers)
+            exam_page.save()
     else:
         form = UploadOutputFileForm()
 
     context = {
-        'exam': exam,
-        'student': student,
+         'exam': exam_page.exam,
+        'student': exam_page.student,
         'exam_page': exam_page,
-        'coding_question': coding_question,
+        'choice_questions_answers': exam_page.choice_question_answers_(),
+        'coding_questions_answers': exam_page.coding_question_answers_(),
+        'coding_question': exam_page.coding_questions_pk_(coding_question_id),
         'coding_question_id': coding_question_id,
-        'choice_questions_answers': exam_page.choice_question_answers.split(','),
-        'coding_questions_answers': exam_page.coding_question_answers.split(','),
         'form': form,
         }
     return render(request, 'exam_c/exam_page_coding_question.html', context)

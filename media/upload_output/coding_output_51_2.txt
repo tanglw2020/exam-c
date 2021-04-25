@@ -1,0 +1,26 @@
+import numpy as np
+import random
+
+str_set = ['never','too','old','to','play']
+space_set = [' ','  ']
+
+inputs, outputs =[], []
+for i in range(1000):
+    line, cnt = '', 0
+    for j in range(10):
+        if random.choice([0,1]) == 0:
+            line = line + random.choice(str_set)
+        else: 
+            line = line + ' '
+            cnt = cnt + 1
+    inputs.append(line)
+    outputs.append(cnt)
+
+
+with open('input.txt','w')  as f:
+    for i in inputs:
+        f.write(str(i)+'\n')
+
+with open('output.txt','w')  as f:
+    for i in outputs:
+        f.write(str(i)+'\n')
