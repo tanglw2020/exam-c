@@ -45,6 +45,12 @@ class Exam(models.Model):
     info_text = models.CharField('考试信息', max_length=200, default='')
     period = models.CharField("考试时长", max_length=5, choices=PERIOD_CHOICES, default='1')
 
+    choice_question_num = models.IntegerField(verbose_name="选择题个数", default=10)
+    choice_question_score = models.IntegerField(verbose_name="选择题分值", default=4)
+    coding_question_num = models.IntegerField(verbose_name="编程题个数", default=2)
+    coding_question_score = models.IntegerField(verbose_name="编程题分值", default=30)
+    # choice_question_num = models.IntegerField()
+
     def __str__(self):
         return str(self.id) + ' ' +self.info_text
 

@@ -154,7 +154,7 @@ def login(request):
 
             # 检查该考场和学号对应的试卷是否存在，不存在就创建新的试卷
             # 同时随机抽取题目
-            choice_question_numb, coding_question_numb = 10, 2
+            choice_question_numb, coding_question_numb = exam.choice_question_num, exam.coding_question_num
             if not ExamPaper.objects.filter(student=student, exam=exam).exists():
                 exam_paper = ExamPaper.objects.create(student=student, exam=exam)
                 exam_paper.problem_type = exam.problem_type
