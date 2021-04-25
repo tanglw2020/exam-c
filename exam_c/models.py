@@ -299,9 +299,11 @@ class ExamPaper(models.Model):
 
     choice_questions = models.TextField("选择题列表", max_length=1000,  blank=True, default='')
     choice_question_answers = models.TextField("选择题答案列表", max_length=1000, blank=True,  default='')
+    choice_question_results = models.TextField("选择题评分", max_length=1000, blank=True,  default='')
 
     coding_questions = models.TextField("编程题列表", max_length=1000, blank=True, default='')
     coding_question_answers = models.TextField("编程题答案列表", max_length=1000, blank=True, default='')
+    coding_question_results = models.TextField("编程题评分", max_length=1000, blank=True, default='')
 
     def start_time_(self):
         return str(self.start_time)
@@ -347,6 +349,22 @@ class ExamPaper(models.Model):
         return output_save_path
     coding_output_path_.short_description = '上传结果保存目录'
 
+    def update_choice_question_answer_result_(self, question_id, choice_id):
+        old_answers = self.choice_question_answers.split(',')
+        old_answers[question_id-1] = str(choice_id)
+        self.choice_question_answers = ','.join(old_answers)
+
+        choice_question = self.choice_questions_pk_(question_id)
+        if choice_question.answer == str(choice_id):
+            score = '1'
+        else:
+            score = '0'
+        old_answers = self.choice_question_results.split(',')
+        old_answers[question_id-1] = score
+        self.choice_question_results = ','.join(old_answers)
+        self.save()
+
+        # print(self.choice_question_results)
 
 class StudentInfoImporter(models.Model):
     class Meta:

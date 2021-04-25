@@ -165,12 +165,14 @@ def login(request):
                 choice_questions_ids = random.sample(choice_questions_ids, choice_question_numb)
                 exam_paper.choice_questions = ','.join(choice_questions_ids)
                 exam_paper.choice_question_answers = ','.join(['+' for i in range(len(choice_questions_ids))])
+                exam_paper.choice_question_results = ','.join(['0' for i in range(len(choice_questions_ids))])
 
                 #########
                 code_questions_ids = [str(x['id']) for x in CodingQuestion.objects.values('id')]
                 code_questions_ids = random.sample(code_questions_ids, coding_question_numb)
                 exam_paper.coding_questions = ','.join(code_questions_ids)
                 exam_paper.coding_question_answers = ','.join(['+' for i in range(len(code_questions_ids))])
+                exam_paper.coding_question_results = ','.join(['0' for i in range(len(code_questions_ids))])
                 exam_paper.save()
             else:
                 exam_paper = ExamPaper.objects.get(student=student, exam=exam)
@@ -207,10 +209,11 @@ def api_handle_choice_answer(request, exampage_id, choice_question_id, choice_id
     except ExamPaper.DoesNotExist:
         a = {"result":"null"}
         return HttpResponse(json.dumps(a), content_type='application/json')
-    old_answers = exam_page.choice_question_answers.split(',')
-    old_answers[choice_question_id-1] = str(choice_id)
-    exam_page.choice_question_answers = ','.join(old_answers)
-    exam_page.save()
+    # old_answers = exam_page.choice_question_answers.split(',')
+    # old_answers[choice_question_id-1] = str(choice_id)
+    # exam_page.choice_question_answers = ','.join(old_answers)
+    # exam_page.save()
+    exam_page.update_choice_question_answer_result_(choice_question_id, choice_id)
     a = {}
     return HttpResponse(json.dumps(a), content_type='application/json')
 
