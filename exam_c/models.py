@@ -49,7 +49,6 @@ class Exam(models.Model):
     choice_question_score = models.IntegerField(verbose_name="选择题分值", default=4)
     coding_question_num = models.IntegerField(verbose_name="编程题个数", default=2)
     coding_question_score = models.IntegerField(verbose_name="编程题分值", default=30)
-    # choice_question_num = models.IntegerField()
 
     def __str__(self):
         return str(self.id) + ' ' +self.info_text
@@ -234,52 +233,6 @@ class CodingQuestion(models.Model):
 
 
 
-# class CompletionQuestion(models.Model):
-#     class Meta:
-#         verbose_name = '填空题'
-#         verbose_name_plural = '填空题'
-
-#     def __str__(self):
-#         return '题'+str(self.id)
-
-#     problem_type = models.CharField("试卷类型", max_length=20, choices=EXAM_TYPE_CHOICES, default='1')
-#     question_text = models.TextField('题目', help_text="题目填空处使用 ______[6个英文下划线] 的形式表示", )
-#     answer_text = models.TextField('对应答案', help_text="题目中每个______对应的答案单独一行", default='')
-
-#     def problem_type_(self):
-#         return EXAM_TYPE_CHOICES[int(self.problem_type)-1][1]
-#     problem_type_.short_description = '试卷类型'
-
-#     def ansower_html_(self):
-#         answer_text = [x for x in self.answer_text.split('\n')]
-#         return format_html("<ol>") + \
-#                 format_html_join(
-#                 '\n', '<li style="color:{};">{}</li>',
-#                 (('black', x) for x in answer_text)
-#                 ) \
-#                 + format_html("</ol>")
-#     ansower_html_.short_description = '答案'
-
-#     def question_html_(self):
-#         question_text = [x for x in self.question_text.split('\n')]
-#         return format_html_join(
-#                 '', '<p style="color:{};">{}</p>',
-#                 (('black', x) for x in question_text)
-#                 )
-#     question_html_.short_description = '题目'
-
-#     def clean(self):
-#         question_text = self.question_text.replace(' ','')
-
-#         count_flags = question_text.count('______')  ## find all '______'
-#         if count_flags==0:
-#             raise ValidationError({'question_text': _('______ 缺失')})
-
-#         answer_text_list = self.answer_text.split('\n')
-#         answer_text_list = [x.strip() for x in answer_text_list if len(x.strip())>0]
-#         if len(answer_text_list) != count_flags:
-#             raise ValidationError({'question_text': _('______和答案数目不一致')})
-
 
 class ExamPaper(models.Model):
     class Meta:
@@ -370,6 +323,11 @@ class ExamPaper(models.Model):
         self.choice_question_results = ','.join(old_answers)
         self.save()
 
+    def choice_question_result_stat(self):
+        answers = [x for x in self.choice_question_answers.split(',') if x!='+']
+        results = [x for x in self.choice_question_results.split(',') if x=='1']
+        return self.exam.choice_question_num, len(answers), len(results)
+
         # print(self.choice_question_results)
 
 class StudentInfoImporter(models.Model):
@@ -398,3 +356,52 @@ class StudentInfoImporter(models.Model):
                     Student.objects.get_or_create(class_name=class_name, student_id=x[0], student_name=x[1])
                     # p = Student(class_name=class_name, student_id=x[0], student_name=x[1])
                     # p.save()
+
+
+
+
+# class CompletionQuestion(models.Model):
+#     class Meta:
+#         verbose_name = '填空题'
+#         verbose_name_plural = '填空题'
+
+#     def __str__(self):
+#         return '题'+str(self.id)
+
+#     problem_type = models.CharField("试卷类型", max_length=20, choices=EXAM_TYPE_CHOICES, default='1')
+#     question_text = models.TextField('题目', help_text="题目填空处使用 ______[6个英文下划线] 的形式表示", )
+#     answer_text = models.TextField('对应答案', help_text="题目中每个______对应的答案单独一行", default='')
+
+#     def problem_type_(self):
+#         return EXAM_TYPE_CHOICES[int(self.problem_type)-1][1]
+#     problem_type_.short_description = '试卷类型'
+
+#     def ansower_html_(self):
+#         answer_text = [x for x in self.answer_text.split('\n')]
+#         return format_html("<ol>") + \
+#                 format_html_join(
+#                 '\n', '<li style="color:{};">{}</li>',
+#                 (('black', x) for x in answer_text)
+#                 ) \
+#                 + format_html("</ol>")
+#     ansower_html_.short_description = '答案'
+
+#     def question_html_(self):
+#         question_text = [x for x in self.question_text.split('\n')]
+#         return format_html_join(
+#                 '', '<p style="color:{};">{}</p>',
+#                 (('black', x) for x in question_text)
+#                 )
+#     question_html_.short_description = '题目'
+
+#     def clean(self):
+#         question_text = self.question_text.replace(' ','')
+
+#         count_flags = question_text.count('______')  ## find all '______'
+#         if count_flags==0:
+#             raise ValidationError({'question_text': _('______ 缺失')})
+
+#         answer_text_list = self.answer_text.split('\n')
+#         answer_text_list = [x.strip() for x in answer_text_list if len(x.strip())>0]
+#         if len(answer_text_list) != count_flags:
+#             raise ValidationError({'question_text': _('______和答案数目不一致')})

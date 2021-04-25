@@ -31,14 +31,6 @@ def exampage(request, exampage_id):
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('c:login'))
 
-    # coding_question_ids = [int(x) for x in exam_page.coding_questions.split(',') if len(x)]
-    # coding_questions = []
-    # for i in coding_question_ids:
-    #     coding_questions.append(CodingQuestion.objects.get(pk=i))
-
-    # 'choice_questions': exam_page.choice_questions_all_(),
-    # 'coding_questions': coding_questions,
-
     context = {
         'exam': exam_page.exam,
         'student': exam_page.student,
@@ -115,6 +107,7 @@ def get_host_ip():
     finally:
         s.close()
     return ip
+
 
 def exam_room(request, exam_id):
     try:
