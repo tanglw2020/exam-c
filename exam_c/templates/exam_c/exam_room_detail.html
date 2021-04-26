@@ -92,6 +92,8 @@
               <td >学号</td>
               <td >开考时间</td>
               <td >选择题</td>
+              <td >编程题</td>
+              <td >得分</td>
             </tr>
             {% for exam_paper in exam_papers %}
             <tr>
@@ -101,6 +103,8 @@
               <td>{{ exam_paper.student.student_id }}</td>
               <td>{{ exam_paper.start_time_ }}</td>
               <td>{{ exam_paper.choice_question_result_stat }}</td>
+              <td>{{ exam_paper.coding_question_result_stat }}</td>
+              <td>{{ exam_paper.total_score }}</td>
             </tr>
             {% endfor %}
         </table>

@@ -77,15 +77,16 @@ def exampage_coding_question(request, exampage_id, coding_question_id):
             output_save_path = exam_page.coding_output_path_(coding_question_id)
             handle_uploaded_file(request.FILES['file'], output_save_path)
             ## update coding answers
-            old_answers = exam_page.coding_question_answers.split(',')
-            old_answers[coding_question_id-1] = str(output_save_path)
-            exam_page.coding_question_answers = ','.join(old_answers)
-            exam_page.save()
+            # old_answers = exam_page.coding_question_answers.split(',')
+            # old_answers[coding_question_id-1] = str(output_save_path)
+            # exam_page.coding_question_answers = ','.join(old_answers)
+            # exam_page.save()
+            exam_page.update_coding_question_answer_result_(coding_question_id, output_save_path)
     else:
         form = UploadOutputFileForm()
 
     context = {
-         'exam': exam_page.exam,
+        'exam': exam_page.exam,
         'student': exam_page.student,
         'exam_page': exam_page,
         'choice_questions_answers': exam_page.choice_question_answers_(),
