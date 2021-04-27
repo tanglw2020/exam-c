@@ -106,14 +106,14 @@
 
     <div class="alert alert-primary" role="alert">
         <form action="" method="post">
-           <p>第{{ choice_question_id }}题：{{ choice_question.question_text }} </p>
+           <p>第{{ choice_question_id }}题：{{ choice_question.question_text |linebreaks }} </p>
           <label><input name="Choice" type="radio"  id='choice1' /> {{ choice_question.choice_1 }} </label> </br>
           <label><input name="Choice" type="radio"  id='choice2' /> {{ choice_question.choice_2 }} </label> </br>
           <label><input name="Choice" type="radio"  id='choice3' /> {{ choice_question.choice_3 }} </label> </br>
           <label><input name="Choice" type="radio"  id='choice4' /> {{ choice_question.choice_4 }} </label> </br>
         </form>
-        <h2 id="Fruit">选项</h2></br>
-        <p>{{ choice_questions_answers }} </p>
+        <!-- <h2 id="Fruit">选项</h2></br> -->
+        <!-- <p>{{ choice_questions_answers }} </p> -->
     </div>
 
 
