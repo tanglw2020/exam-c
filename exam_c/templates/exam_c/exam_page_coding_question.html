@@ -111,17 +111,26 @@
         <!-- <p>{{ coding_questions_answers }} </p> -->
     </div>
 
-    <HR style= " FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )" width ="100%" color =#987 cb 9 SIZE = 20>
+    <HR style= " FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )" width ="100%" color =#987 cb 9 SIZE = 60>
     <div>
-      <a type="button" class="btn btn-info" href="{% url 'c:api-download-coding-zipfile'  exam_page.id  coding_question_id %}">下载题目ZIP文件</a>
+      <div id="passwordHelpBlock" class="form-text">
+        <h4>下载题目所需ZIP文件</h4>
+      </div>
+      <a type="button" class="btn btn-info" href="{% url 'c:api-download-coding-zipfile'  exam_page.id  coding_question_id %}">下载文件</a>
     </div>
 
     <HR style= " FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )" width ="100%" color =#987 cb 9 SIZE = 20>
       <div>
         <form method='POST' action='' enctype='multipart/form-data'>
           {% csrf_token %}
-          {{ form.as_p }}
-          <input type="submit" class="btn btn-info" value="上传结果文件" name="">
+          {{ form.non_field_errors }}
+          <div id="passwordHelpBlock" class="form-text">
+            <h4>上传运行程序输出的output.txt文件</h4>
+          </div>
+          <div class="mb-3">
+            {{ form.file }}  {{ form.file.errors }}
+        </div>
+          <input type="submit" class="btn btn-info" value="上传文件" name="">
       </form>
       </div>
 
