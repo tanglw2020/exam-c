@@ -123,7 +123,7 @@ def exam_room(request, exam_id):
         'exam': exam,
         'exam_id': exam_id,
         'exam_papers': exam_papers,
-        'login_url': get_host_ip()+':8000/c/login',
+        'login_url': 'http://'+get_host_ip()+':8000/c/login',
         }
     return render(request, 'exam_c/exam_room_detail.html', context)
 
