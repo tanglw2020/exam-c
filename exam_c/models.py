@@ -5,6 +5,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.utils.html import format_html, format_html_join
+from django.utils import timezone
 import re
 import os
 import shutil
@@ -39,16 +40,16 @@ class Exam(models.Model):
     class Meta:
         verbose_name = '考试场次'
         verbose_name_plural = '考试场次'
-    pub_date = models.DateTimeField('创建时间', 'date published', null=True)
+    pub_date = models.DateTimeField('创建时间', 'date published', null=True, default=timezone.now)
     problem_type = models.CharField("试卷类型", max_length=20, choices=EXAM_TYPE_CHOICES, default='1')
-    creator = models.CharField('创建人', max_length=200, default='')
-    info_text = models.CharField('考试信息', max_length=200, default='')
+    creator = models.CharField('创建人', max_length=200, default='X老师')
+    info_text = models.CharField('考试信息', max_length=200, default='C语言期末考试')
     period = models.CharField("考试时长", max_length=5, choices=PERIOD_CHOICES, default='1')
 
-    choice_question_num = models.IntegerField(verbose_name="选择题个数", default=10)
-    choice_question_score = models.IntegerField(verbose_name="选择题分值", default=4)
-    coding_question_num = models.IntegerField(verbose_name="编程题个数", default=2)
-    coding_question_score = models.IntegerField(verbose_name="编程题分值", default=30)
+    choice_question_num = models.IntegerField(verbose_name="选择题个数", default=20)
+    choice_question_score = models.IntegerField(verbose_name="选择题分值", default=2)
+    coding_question_num = models.IntegerField(verbose_name="编程题个数", default=3)
+    coding_question_score = models.IntegerField(verbose_name="编程题分值", default=20)
 
     def __str__(self):
         return str(self.id) + ' ' +self.info_text
