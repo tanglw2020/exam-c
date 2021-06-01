@@ -339,9 +339,9 @@ class ExamPaper(models.Model):
         ## 
         coding_question = self.coding_questions_pk_(coding_question_id)
         answer_path = coding_question.upload_answer_file.path
-        with open(answer_path) as f:
+        with open(answer_path, encoding='utf-8') as f:
             answers = [x.strip() for x in f.readlines()]
-        with open(output_save_path) as f:
+        with open(output_save_path, encoding='utf-8') as f:
             outputs = [x.strip() for x in f.readlines()]
         # print(outputs)
         min_len = min(len(answers), len(outputs))
