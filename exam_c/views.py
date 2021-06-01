@@ -190,7 +190,7 @@ def api_get_server_time(request, exampage_id):
         a = {"result":"null"}
         return HttpResponse(json.dumps(a), content_type='application/json')
 
-    diff = int(datetime.datetime.now().timestamp() - exam_page.start_time.timestamp())
+    diff = int(timezone.now().timestamp() - exam_page.start_time.timestamp())
     a = {}
     a["result"] = str(int(diff/60))+'分钟'+str(diff%60)+'秒'  ##"post_success"
     return HttpResponse(json.dumps(a), content_type='application/json')

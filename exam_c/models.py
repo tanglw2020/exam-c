@@ -255,7 +255,7 @@ class ExamPaper(models.Model):
         verbose_name='所属考试'
     ) 
 
-    start_time = models.DateTimeField('开考时间', null=True, blank=True,)
+    start_time = models.DateTimeField('开考时间', null=True, blank=True, default=timezone.now)
 
     choice_questions = models.TextField("选择题列表", max_length=1000,  blank=True, default='')
     choice_question_answers = models.TextField("选择题答案列表", max_length=1000, blank=True,  default='')
@@ -266,7 +266,7 @@ class ExamPaper(models.Model):
     coding_question_results = models.TextField("编程题评分", max_length=1000, blank=True, default='')
 
     def start_time_(self):
-        return str(self.start_time)
+        return (self.start_time)
     start_time_.short_description = '开考时间'
 
     def coding_question_answers_(self):
