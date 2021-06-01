@@ -114,8 +114,15 @@
           <label><input name="Choice" type="radio"  id='choice3' /> {{ choice_question.choice_3 }} </label> </br>
           <label><input name="Choice" type="radio"  id='choice4' /> {{ choice_question.choice_4 }} </label> </br>
         </form>
-        <!-- <h2 id="Fruit">选项</h2></br> -->
-        <!-- <p>{{ choice_questions_answers }} </p> -->
+
+        <p>当前选择：<span id="current_ans">
+        {% for a in choice_questions_answers %}
+        {% if forloop.counter == choice_question_id and a != '+' %}
+          {{ a }}
+        {% endif %}
+        {% endfor %}
+      </span></p>
+        <!-- <p>已选择：<span>{{ choice_questions_answers }}</span> </p> -->
     </div>
 
 
@@ -149,19 +156,19 @@
 
     <script type="text/javascript">
       $('#choice1').on('click', function () {
-        $("#Fruit").html("choice1");
+        $("#current_ans").html("1");
         sendChoiceAnswer(1);
       });
       $('#choice2').on('click', function () {
-        $("#Fruit").html("choice2");
+        $("#current_ans").html("2");
         sendChoiceAnswer(2);
       });
       $('#choice3').on('click', function () {
-        $("#Fruit").html("choice3");
+        $("#current_ans").html("3");
         sendChoiceAnswer(3);
       });
       $('#choice4').on('click', function () {
-        $("#Fruit").html("choice4");
+        $("#current_ans").html("4");
         sendChoiceAnswer(4);
       });
     </script>
