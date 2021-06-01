@@ -218,11 +218,14 @@ def api_download_scorelist(request, exam_id):
         raise Http404("exam does not exist")
 
     exam_papers = exam.exampaper_set.all()
-    line_head ="#,班级,姓名,学号,开考时间"
+    line_head ="# 班级 姓名 学号 选择题 编程题 总分"
     lines = [line_head]
     for i,exam_paper in enumerate(exam_papers):
-        one_line = ','.join([str(i), exam_paper.student.class_name, exam_paper.student.student_name, 
-        exam_paper.student.student_id, exam_paper.start_time_()])
+        one_line = ' '.join([str(i), exam_paper.student.class_name, exam_paper.student.student_name, 
+        exam_paper.student.student_id,
+        str(exam_paper.choice_question_result_stat()).replace(' ',''),
+        str(exam_paper.coding_question_result_stat()).replace(' ',''),
+        str(exam_paper.total_score()) ])
         # print(one_line)
         lines.append(one_line)
     
