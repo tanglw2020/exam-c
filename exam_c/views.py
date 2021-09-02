@@ -20,9 +20,9 @@ from .forms import StudentForm, UploadOutputFileForm
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_ROOT  = BASE_DIR / 'media'
 
-def index(request):
-    exam_list = Exam.objects.all()
-    return render(request, 'exam_c/index.html')
+# def index(request):
+#     exam_list = Exam.objects.all()
+#     return render(request, 'exam_c/index.html')
 
 
 def exampage(request, exampage_id):
@@ -211,6 +211,7 @@ def api_handle_choice_answer(request, exampage_id, choice_question_id, choice_id
     a = {}
     return HttpResponse(json.dumps(a), content_type='application/json')
 
+@csrf_exempt
 def api_download_scorelist(request, exam_id):
     try:
         exam = Exam.objects.get(id=exam_id)
@@ -218,13 +219,13 @@ def api_download_scorelist(request, exam_id):
         raise Http404("exam does not exist")
 
     exam_papers = exam.exampaper_set.all()
-    line_head ="# 班级 姓名 学号 选择题 编程题 总分"
+    line_head ="编号 班级 姓名 学号 选择题 编程题 总分"
     lines = [line_head]
     for i,exam_paper in enumerate(exam_papers):
         one_line = ' '.join([str(i), exam_paper.student.class_name, exam_paper.student.student_name, 
         exam_paper.student.student_id,
         str(exam_paper.choice_question_result_stat()).replace(' ',''),
-        str(exam_paper.coding_question_result_stat()).replace(' ',''),
+        str(exam_paper.coding_question_result_detail()).replace(' ',''),
         str(exam_paper.total_score()) ])
         # print(one_line)
         lines.append(one_line)

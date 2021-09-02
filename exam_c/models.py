@@ -58,6 +58,11 @@ class Exam(models.Model):
         return str(self.id)
     id_.short_description = '考试编号'
 
+    def all_question_stat_(self):
+        return '选择题'+str(self.choice_question_num)+'X'+str(self.choice_question_score)+\
+            '+'+'编程题'+str(self.coding_question_num)+'X'+str(self.coding_question_score)
+    all_question_stat_.short_description = '考题统计'
+
     def exam_type_(self):
         return str(EXAM_TYPE_CHOICES[int(self.problem_type)-1][1])
     exam_type_.short_description = '考试类型'
@@ -67,8 +72,8 @@ class Exam(models.Model):
     period_.short_description = '考试时长'
 
     def out_link_(self):
-        return format_html('<a href="/c/examroom/{}" target="_blank">查看</a>'.format(self.id))
-    out_link_.short_description = '考试情况'
+        return format_html('<a href="/c/examroom/{}" target="_blank">点击查看</a>'.format(self.id))
+    out_link_.short_description = '考场详情'
 
 
 class Student(models.Model):
@@ -205,10 +210,8 @@ class CodingQuestion(models.Model):
                         '', '<p style="color:{};">{}</p>',
                         (('black', x) for x in lines)
                         )
-        # else:
         except:
             return ''
-        # return ''
     code_html_.short_description = '代码'
 
     def zip_path_(self):
@@ -228,8 +231,8 @@ class CodingQuestion(models.Model):
             c_path, input_path = self.upload_c_file.path, self.upload_input_file.path
             print(zip_path)
             zf = zipfile.ZipFile(zip_path, 'w')
-            zf.write(c_path,'main.c')
-            zf.write(input_path,'input.txt')
+            zf.write(c_path,'{}/main.c'.format('coding'))
+            zf.write(input_path,'{}/input.txt'.format('coding'))
             zf.close()
 
 
@@ -362,6 +365,11 @@ class ExamPaper(models.Model):
         for i in range(len(results)):
             sum = sum + results[i]
         return self.exam.coding_question_num, len(answers), sum
+
+    def coding_question_result_detail(self):
+        answers = [x for x in self.coding_question_answers.split(',') if x!='+']
+        results = [float(x) for x in self.coding_question_results.split(',')]
+        return results
 
     def total_score(self):
         _,_, choice_question_correct_num = self.choice_question_result_stat()
