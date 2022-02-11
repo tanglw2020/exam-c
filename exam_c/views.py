@@ -14,7 +14,7 @@ import random
 from pathlib import Path
 
 from .models import *
-from .forms import StudentForm, UploadOutputFileForm
+from .forms import StudentForm, UploadOutputFileForm, StudentFormSecondLogin
 # Create your views here.
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,7 +27,7 @@ MEDIA_ROOT  = BASE_DIR / 'media'
 
 def exampage(request, exampage_id):
     try:
-        exam_page = ExamPaper.objects.get(id=exampage_id)
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('c:login'))
 
@@ -42,7 +42,7 @@ def exampage(request, exampage_id):
 
 def exampage_choice_question(request, exampage_id, choice_question_id):
     try:
-        exam_page = ExamPaper.objects.get(id=exampage_id)
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('c:login'))
 
@@ -66,7 +66,7 @@ def handle_uploaded_file(f, output_save_path):
 
 def exampage_coding_question(request, exampage_id, coding_question_id):
     try:
-        exam_page = ExamPaper.objects.get(id=exampage_id)
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('c:login'))
 
@@ -123,7 +123,7 @@ def exam_room(request, exam_id):
         'exam': exam,
         'exam_id': exam_id,
         'exam_papers': exam_papers,
-        'login_url': 'http://'+get_host_ip()+':8000/c/login',
+        'login_url': 'http://'+get_host_ip()+':8000/c',
         }
     return render(request, 'exam_c/exam_room_detail.html', context)
 
@@ -142,6 +142,7 @@ def login(request):
             # 查询用户是否在数据库中
             exam_id = cleaned_data['exam_id']
             student_id = cleaned_data['student_id']
+            unique_key = str(exam_id)+'-'+str(student_id)
 
             exam = Exam.objects.get(pk=exam_id)
             student = Student.objects.get(student_id=student_id)
@@ -149,10 +150,13 @@ def login(request):
             # 检查该考场和学号对应的试卷是否存在，不存在就创建新的试卷
             # 同时随机抽取题目
             choice_question_numb, coding_question_numb = exam.choice_question_num, exam.coding_question_num
-            if not ExamPaper.objects.filter(student=student, exam=exam).exists():
-                exam_paper = ExamPaper.objects.create(student=student, exam=exam)
+            exam_paper, created = ExamPaper.objects.get_or_create(student=student, exam=exam, unique_key=unique_key)
+            if created or exam_paper.is_empty_():
                 exam_paper.problem_type = exam.problem_type
                 exam_paper.start_time = datetime.datetime.now()
+
+                exam_paper.student_id_local = student_id
+                exam_paper.exam_id_local = exam_id
 
                 #########
                 choice_questions_ids = [str(x['id']) for x in ChoiceQuestion.objects.values('id')]
@@ -168,10 +172,12 @@ def login(request):
                 exam_paper.coding_question_answers = ','.join(['+' for i in range(len(code_questions_ids))])
                 exam_paper.coding_question_results = ','.join(['0' for i in range(len(code_questions_ids))])
                 exam_paper.save()
-            else:
-                exam_paper = ExamPaper.objects.get(student=student, exam=exam)
 
-            return HttpResponseRedirect(reverse('c:exampage', args=(exam_paper.id,)))
+            diff = int(timezone.now().timestamp() - exam_paper.start_time.timestamp())
+            if diff<60: 
+                return HttpResponseRedirect(reverse('c:exampage', args=(exam_paper.unique_key,)))
+            else:
+                return HttpResponseRedirect(reverse('c:login-second', args=(exam_paper.unique_key,)))
     else:
         form = StudentForm()
 
@@ -181,11 +187,43 @@ def login(request):
     return render(request, 'exam_c/login.html', context)
 
 
+def login_second(request, exampage_id):
+
+    try:
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
+    except ExamPaper.DoesNotExist:
+        raise Http404("exampaper {} does not exist".format(exampage_id))
+
+    if request.method == 'POST':
+        form = StudentFormSecondLogin(request.POST)
+
+        if form.is_valid():
+            cleaned_data = form.cleaned_data
+
+            # 查询用户是否在数据库中
+            exam_id = cleaned_data['exam_id']
+            student_id = cleaned_data['student_id']
+            unique_key = str(exam_id)+'-'+str(student_id)
+            return HttpResponseRedirect(reverse('c:exampage', args=(unique_key,)))
+    else:
+        data = {'exam_id': exam_page.exam_id_local, 
+                'student_id': exam_page.student_id_local, 
+                'password': '',
+                'name': exam_page.student.student_name, 
+                }
+        form = StudentFormSecondLogin(data)
+
+    context = {
+        'form': form,
+        }
+    return render(request, 'exam_c/login_second.html', context)
+
+
 @csrf_exempt
 def api_get_server_time(request, exampage_id):
 
     try:
-        exam_page = ExamPaper.objects.get(id=exampage_id)
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
     except ExamPaper.DoesNotExist:
         a = {"result":"null"}
         return HttpResponse(json.dumps(a), content_type='application/json')
@@ -199,7 +237,7 @@ def api_get_server_time(request, exampage_id):
 def api_handle_choice_answer(request, exampage_id, choice_question_id, choice_id):
 
     try:
-        exam_page = ExamPaper.objects.get(id=exampage_id)
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
     except ExamPaper.DoesNotExist:
         a = {"result":"null"}
         return HttpResponse(json.dumps(a), content_type='application/json')
@@ -245,7 +283,7 @@ def api_download_scorelist(request, exam_id):
 def api_download_coding_zipfile(request, exampage_id, coding_question_id):
 
     try:
-        exam_page = ExamPaper.objects.get(id=exampage_id)
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
     except ExamPaper.DoesNotExist:
         a = {"result":"null"}
         return HttpResponse(json.dumps(a), content_type='application/json')

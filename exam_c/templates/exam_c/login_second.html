@@ -3,12 +3,12 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>考生登录页面</title>
+    <title>C语言期末考试系统</title>
     <style type="text/css">
         .login {
             padding-bottom: 140px;
             padding-top: 120px;
-            background-color: rgb(77, 145, 146);
+            background-color: orangered;
             text-align: center;
             height: max-content;
         }
@@ -58,9 +58,9 @@
 
 <body>
     <div class="login">
-        <h2>欢迎登陆</h2>
-        <h1>C语言考试系统</h1>
-        <form action="{% url 'c:login' %}" method="POST">
+        <h1>C语言期末考试系统</h1>
+        <h2>二次登陆</h2>
+        <form action="" method="POST">
             {% csrf_token %}
             {{ form.non_field_errors }}
             <div class="form-row">
@@ -72,8 +72,12 @@
             <div class="form-row">
                 {% include "exam_c/form_item.html" with form_item=form.student_id %}
             </div>
+            <div class="form-row">
+                {% include "exam_c/form_item.html" with form_item=form.password %}
+                <strong>提示：需要监考人员输入。</strong>
+            </div>
 
-            <input type="submit" value="登录" class="login-submit">
+            <input class="login-btn" type="submit" value="登录" class="login-submit">
         </form>
     </div>
 </body>

@@ -5,126 +5,139 @@
 <html lang="zh-CN">
 
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <meta http-equiv="refresh" content="10">
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- 上述3个meta标签*必须*放在最前面，任何其他内容都*必须*跟随其后！ -->
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <meta http-equiv="refresh" content="10">
 
-    <title>C语言考试管理页面</title>
+  <title>C语言考试管理页面</title>
 
-    <!-- Bootstrap core CSS -->
-    <!-- <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"> -->
-    <link rel="stylesheet" type="text/css" href="{% static 'exam_c/css/bootstrap.min.css' %}" >
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <!-- <link href="../../assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet"> -->
+  <!-- Bootstrap core CSS -->
+  <!-- <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet"> -->
+  <link rel="stylesheet" type="text/css" href="{% static 'exam_c/css/bootstrap.min.css' %}">
+  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+  <!-- <link href="../../assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet"> -->
 
-    <!-- Custom styles for this template -->
-    <!-- <link href="starter-template.css" rel="stylesheet"> -->
 
-    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-    <!-- <script src="../../assets/js/ie-emulation-modes-warning.js"></script> -->
+  <style>
+    body {
+      padding-top: 50px;
+    }
 
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
+    .starter-template {
+      padding: 40px 15px;
+      text-align: center;
+    }
 
-    <style>
-        body {
-            padding-top: 50px;
-        }
+    .box {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
 
-        .starter-template {
-            padding: 40px 15px;
-            text-align: center;
-        }
-    </style>
+    .btn-upload {
+      background-color: lightgreen;
+      border: 0ch;
+      color: white;
+      padding: 2px 2px;
+      margin-top: 2px;
+    }
+
+    .btn-download {
+      display: inline-block;
+      background-color: lightgray;
+      border: 0ch;
+      color: black;
+      padding: 6px 6px;
+      margin: 10px 20px;
+      font-size: 15px;
+    }
+  </style>
 </head>
 
 <body>
 
-    <nav class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
-                    aria-expanded="false" aria-controls="navbar">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <a class="navbar-brand" href="#"></a>
-            </div>
-            <!-- <div id="navbar" class="collapse navbar-collapse">
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+          aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#"></a>
+      </div>
+      <!-- <div id="navbar" class="collapse navbar-collapse">
                 <ul class="nav navbar-nav">
                     <li class="active"><a href="#">{{ exam.exam_type_ }}</a></li>
                     <li><a href="#">{{ exam.period_ }}</a></li>
                 </ul>
             </div> -->
-            <!--/.nav-collapse -->
-        </div>
-    </nav>
+      <!--/.nav-collapse -->
+    </div>
+  </nav>
 
 
-    <div class="jumbotron">
-      <div class="container">
-        <h1>{{ exam.exam_type_ }}<small>在线考试系统</small></h1>
-        <p>考试登陆网址: {{ login_url }} </p>
-        <p>考试编号: {{ exam.id }} </p>
-        <p>考试时长: {{ exam.period_ }}</p>
-        <p>考试人数: {{ exam_papers.count }}</p>
-        <p><strong>|请将考试登陆网址和考试编号告知考生|</strong></p>
-      </div>
+  <div class="jumbotron">
+    <div class="container">
+      <h1>{{ exam.exam_type_ }}<small>在线考试系统</small></h1>
+      <p>考试登陆网址: {{ login_url }} </p>
+      <p>考场编号: {{ exam.id }} </p>
+      <p><strong>|请将考试网址和考场编号告知考生|</strong></p>
+      <p>考试时长: {{ exam.period_ }}</p>
+      <p>考试人数: {{ exam_papers.count }}</p>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <div class="starter-template">
+      <h1>考生列表 <a type="button" class="btn btn-info" href="{% url 'c:api-download-scorelist' exam_id %}">导出成绩</a></h1>
+
+      <table class="table table-striped table-bordered">
+        <tr>
+          <th>#</th>
+          <td>班级</td>
+          <td>姓名</td>
+          <td>学号</td>
+          <td>开考时间</td>
+          <td>选择题</td>
+          <td>编程题</td>
+          <td>得分</td>
+        </tr>
+        {% for exam_paper in exam_papers %}
+        <tr>
+          <th scope="row">{{ forloop.counter }}</th>
+          <td>{{ exam_paper.student.class_name }}</td>
+          <td>{{ exam_paper.student.student_name }}</td>
+          <td>{{ exam_paper.student.student_id }}</td>
+          <td>{{ exam_paper.start_time_ | date:'Y-m-d H:i' }}</td>
+          <td>{{ exam_paper.choice_question_result_stat }}</td>
+          <td>{{ exam_paper.coding_question_result_detail }}</td>
+          <td>{{ exam_paper.total_score }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+
     </div>
 
-    <div class="container">
-    
-      <div class="starter-template">
-        <h1>考生列表 <a type="button" class="btn btn-info" href="{% url 'c:api-download-scorelist' exam_id %}">导出成绩</a></h1>
-    
-        <table class="table table-striped table-bordered">
-            <tr >
-              <th >#</th>
-              <td >班级</td>
-              <td >姓名</td>
-              <td >学号</td>
-              <td >开考时间</td>
-              <td >选择题</td>
-              <td >编程题</td>
-              <td >得分</td>
-            </tr>
-            {% for exam_paper in exam_papers %}
-            <tr>
-              <th scope="row">{{ forloop.counter }}</th>
-              <td>{{ exam_paper.student.class_name }}</td>
-              <td>{{ exam_paper.student.student_name }}</td>
-              <td>{{ exam_paper.student.student_id }}</td>
-              <td>{{ exam_paper.start_time_ | date:'Y-m-d H:i' }}</td>
-              <td>{{ exam_paper.choice_question_result_stat }}</td>
-              <td>{{ exam_paper.coding_question_result_detail }}</td>
-              <td>{{ exam_paper.total_score }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-
-      </div>
-    
-      </div><!-- /.container -->
+  </div><!-- /.container -->
 
 
-    <!-- Bootstrap core JavaScript
+  <!-- Bootstrap core JavaScript
     ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="{% static 'exam_c/js/jquery-3.6.0.min.js' %}"></script>
-    <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
-    <script src="{% static 'exam_c/js/bootstrap.min.js' %}"></script>
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="{% static 'exam_c/js/jquery-3.6.0.min.js' %}"></script>
+  <script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>
+  <script src="{% static 'exam_c/js/bootstrap.min.js' %}"></script>
+  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+  <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
 </body>
 
 </html>

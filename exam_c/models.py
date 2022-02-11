@@ -36,31 +36,54 @@ ANSWER_CHOICES = [
 ]
 
 
+class Student(models.Model):
+    class Meta:
+        verbose_name = '考试-考生'
+        verbose_name_plural = '考试-考生'
+    class_name = models.CharField('班级',max_length=100, default='')
+    student_name = models.CharField('姓名', max_length=20, default='')
+    student_id = models.CharField('学号', max_length=20,  unique = True, default='')
+    pass_word = models.CharField('密码', max_length=20, default='', blank=True)
+
+    def __str__(self):
+        return self.class_name+" "+self.student_name +" "+self.student_id
+
+
 class Exam(models.Model):
     class Meta:
-        verbose_name = '考试场次'
-        verbose_name_plural = '考试场次'
+        verbose_name = '考试-考场'
+        verbose_name_plural = '考试-考场'
+
     pub_date = models.DateTimeField('创建时间', 'date published', null=True, default=timezone.now)
     problem_type = models.CharField("试卷类型", max_length=20, choices=EXAM_TYPE_CHOICES, default='1')
-    creator = models.CharField('创建人', max_length=200, default='X老师')
+    creator = models.CharField('创建人', max_length=200, default='..老师')
     info_text = models.CharField('考试信息', max_length=200, default='C语言期末考试')
     period = models.CharField("考试时长", max_length=5, choices=PERIOD_CHOICES, default='1')
 
+    passwd_second_login = models.CharField('二次登录密码', max_length=200, default='3333')
+    opened = models.BooleanField("考场开放？", default=True)
+
     choice_question_num = models.IntegerField(verbose_name="选择题个数", default=20)
     choice_question_score = models.IntegerField(verbose_name="选择题分值", default=2)
-    coding_question_num = models.IntegerField(verbose_name="编程题个数", default=3)
-    coding_question_score = models.IntegerField(verbose_name="编程题分值", default=20)
+    coding_question_num = models.IntegerField(verbose_name="编程题个数", default=4)
+    coding_question_score = models.IntegerField(verbose_name="编程题分值", default=15)
 
     def __str__(self):
-        return str(self.id) + ' ' +self.info_text
+        return '考场-'+str(self.id)
 
     def id_(self):
-        return str(self.id)
+        return '考场-'+str(self.id)
     id_.short_description = '考试编号'
 
+    def clean(self):
+        score = self.choice_question_num*self.choice_question_score + \
+            self.coding_question_num * self.coding_question_score
+        if score != 100:
+            raise ValidationError(_('总分值不等于100'))
+
     def all_question_stat_(self):
-        return '选择题'+str(self.choice_question_num)+'X'+str(self.choice_question_score)+\
-            '+'+'编程题'+str(self.coding_question_num)+'X'+str(self.coding_question_score)
+        return '选择题'+str(self.choice_question_score)+'分X'+str(self.choice_question_num)+ \
+            ' + '+'编程题'+str(self.coding_question_score)+'分X'+str(self.coding_question_num)
     all_question_stat_.short_description = '考题统计'
 
     def exam_type_(self):
@@ -76,175 +99,15 @@ class Exam(models.Model):
     out_link_.short_description = '考场详情'
 
 
-class Student(models.Model):
-    class Meta:
-        verbose_name = '考生'
-        verbose_name_plural = '考生'
-    class_name = models.CharField('班级',max_length=100, default='')
-    student_name = models.CharField('姓名', max_length=20, default='')
-    student_id = models.CharField('学号', max_length=20, default='')
-    pass_word = models.CharField('密码', max_length=20, default='', blank=True)
-
-    def __str__(self):
-        return self.class_name+" "+self.student_name +" "+self.student_id
-
-
-class ChoiceQuestion(models.Model):
-    class Meta:
-        verbose_name = '选择题'
-        verbose_name_plural = '选择题'
-
-    def __str__(self):
-        return '题'+str(self.id)
-
-    problem_type = models.CharField("试卷类型", max_length=20, choices=EXAM_TYPE_CHOICES, default='1')
-
-    question_text = models.TextField('题干')
-    choice_1 = models.CharField('选项1', max_length=200,  default='')
-    choice_2 = models.CharField('选项2', max_length=200,  default='')
-    choice_3 = models.CharField('选项3', max_length=200,  default='')
-    choice_4 = models.CharField('选项4', max_length=200,  default='')
-
-    answer = models.CharField("正确选项", max_length=2, choices=ANSWER_CHOICES, default='1')
-
-    def question_html_(self):
-        question_text = [x for x in self.question_text.split('\n')]
-        return format_html_join(
-                '', '<p style="color:{};">{}</p>',
-                (('black', x) for x in question_text)
-                )
-    question_html_.short_description = '题目'
-
-    def answer_list_(self):
-        choice_list = [
-            ['white', 'A. '+ self.choice_1], 
-            ['white', 'B. '+  self.choice_2], 
-            ['white', 'C. '+  self.choice_3], 
-            ['white', 'D. '+  self.choice_4], 
-            ]
-        choice_list[int(self.answer)-1][0] = 'Lime'
-
-        return format_html("<ul>") + \
-                format_html_join(
-                '\n', '<li style="background-color:{};">{}</li>',
-                ((x[0], x[1]) for x in choice_list)
-                ) \
-                + format_html("</ul>")
-    answer_list_.short_description = '题目选项'
-
-
-def validate_zipfile(value):
-    extension = value.name.split('.')[-1]
-    if extension not in ['zip',]:
-        raise ValidationError(
-            _(value.name+'不是zip压缩文件'),
-            params={'value': value.name},
-        )
-
-def validate_txtfile(value):
-    extension = value.name.split('.')[-1]
-    if extension not in ['txt',]:
-        raise ValidationError(
-            _(value.name+'不是txt文件'),
-            params={'value': value.name},
-        )
-
-def validate_cfile(value):
-    extension = value.name.split('.')[-1]
-    if extension not in ['c',]:
-        raise ValidationError(
-            _(value.name+'不是c文件'),
-            params={'value': value.name},
-        )
-
-def validate_csvfile(value):
-    extension = value.name.split('.')[-1]
-    if extension not in ['csv',]:
-        raise ValidationError(
-            _(value.name+'不是csv文件'),
-            params={'value': value.name},
-        )
-
-class CodingQuestion(models.Model):
-    class Meta:
-        verbose_name = '编程题'
-        verbose_name_plural = '编程题'
-
-    def __str__(self):
-        return '题'+str(self.id)
-
-    problem_type = models.CharField("试卷类型", max_length=20, choices=EXAM_TYPE_CHOICES, default='1')
-    question_text = models.TextField('题目简介', )
-    # upload_zipfile = models.FileField(upload_to='upload_zipfile/', null=True, blank=True, 
-    # validators=[validate_zipfile], verbose_name='上传题目文件zip压缩包')
-
-    upload_description_file = models.FileField(upload_to='upload_c_file/', null=True, blank=True, 
-    validators=[validate_txtfile], verbose_name='上传题目描述[.txt文件]')
-
-    upload_c_file = models.FileField(upload_to='upload_c_file/', null=True, blank=True, 
-    validators=[validate_cfile], verbose_name='上传C文件[.c文件]')
-
-    upload_input_file = models.FileField(upload_to='upload_answer_file/', null=True, blank=True, 
-    validators=[validate_txtfile], verbose_name='上传题目输入[.txt文件]')
-
-    upload_answer_file = models.FileField(upload_to='upload_answer_file/', null=True, blank=True, 
-    validators=[validate_txtfile], verbose_name='上传题目输出[.txt文件]')
-
-    def question_html_(self):
-        try:
-            with open(self.upload_description_file.path,'r', encoding='utf-8') as f:
-                lines = f.readlines()
-                return format_html_join(
-                        '', '<p style="color:{};">{}</p>',
-                        (('black', x) for x in lines)
-                        )
-        except:
-            return ''
-    question_html_.short_description = '题目'
-
-    def code_html_(self):
-        try:
-            with open(self.upload_c_file.path,'r', encoding='utf-8') as f:
-                lines = f.readlines()
-                return format_html_join(
-                        '', '<p style="color:{};">{}</p>',
-                        (('black', x) for x in lines)
-                        )
-        except:
-            return ''
-    code_html_.short_description = '代码'
-
-    def zip_path_(self):
-        try:
-            c_path, input_path = self.upload_c_file.path, self.upload_input_file.path
-            paths = os.path.split(input_path)
-            return os.path.sep.join([paths[0], 'coding-'+str(self.id)+'.zip'])
-        except:
-            return ''
-    zip_path_.short_description = '压缩文件'
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)  
-        zip_path = self.zip_path_()
-        if zip_path:
-            if os.path.exists(zip_path): os.remove(zip_path)
-            c_path, input_path = self.upload_c_file.path, self.upload_input_file.path
-            print(zip_path)
-            zf = zipfile.ZipFile(zip_path, 'w')
-            zf.write(c_path,'{}/main.c'.format('coding'))
-            zf.write(input_path,'{}/input.txt'.format('coding'))
-            zf.close()
-
-
 
 
 class ExamPaper(models.Model):
     class Meta:
-        verbose_name = '试卷'
-        verbose_name_plural = '试卷'
+        verbose_name = '考试-试卷'
+        verbose_name_plural = '考试-试卷'
 
     def __str__(self):
-        return '试卷'+str(self.id)
+        return '试卷-'+str(self.unique_key)
 
     problem_type = models.CharField("试卷类型", max_length=20, choices=EXAM_TYPE_CHOICES, default='1')
     student = models.ForeignKey(
@@ -255,10 +118,17 @@ class ExamPaper(models.Model):
     exam = models.ForeignKey(
         Exam,
         on_delete=models.CASCADE, null=True,
-        verbose_name='所属考试'
+        verbose_name='所属考场'
     ) 
+    unique_key = models.CharField('unique-key', max_length=20, primary_key=True, default='xxx')  #  student_id_local+exam_id_local
 
     start_time = models.DateTimeField('开考时间', null=True, blank=True, default=timezone.now)
+    end_time = models.DateTimeField('交卷时间', null=True, blank=True, default=timezone.now)
+    add_time = models.IntegerField("附加延时[分]", default=0)
+    enabled = models.BooleanField("是否可以作答?", default=True)
+
+    student_id_local = models.CharField('学号', max_length=20, default='')
+    exam_id_local = models.CharField('考场号', max_length=20, default='')
 
     choice_questions = models.TextField("选择题列表", max_length=1000,  blank=True, default='')
     choice_question_answers = models.TextField("选择题答案列表", max_length=1000, blank=True,  default='')
@@ -268,9 +138,33 @@ class ExamPaper(models.Model):
     coding_question_answers = models.TextField("编程题答案列表", max_length=1000, blank=True, default='')
     coding_question_results = models.TextField("编程题评分", max_length=1000, blank=True, default='')
 
+
+    def is_empty_(self):
+        if self.exam.choice_question_num:
+            if len(self.choice_questions)<1: return True
+
+        if self.exam.coding_question_num:
+            if len(self.coding_questions)<1: return True
+        return False
+
+
+    def disable_(self):
+        self.enabled = False
+        self.end_time = datetime.datetime.now()
+        self.save()
+
+    def add_time_enable_(self, t=3):
+        self.enabled = True
+        self.add_time = self.add_time + t
+        self.save()
+
     def start_time_(self):
-        return (self.start_time)
+        return (self.start_time.strftime("%Y-%m-%d %H:%M:%S"))
     start_time_.short_description = '开考时间'
+
+    def end_time_(self):
+        return (self.end_time.strftime("%Y-%m-%d %H:%M:%S"))
+    end_time_.short_description = '结束时间'
 
     def coding_question_answers_(self):
         return self.coding_question_answers.split(',')
@@ -376,13 +270,164 @@ class ExamPaper(models.Model):
         _,_, coding_question_correct_num = self.coding_question_result_stat()
         return choice_question_correct_num*self.exam.choice_question_score + coding_question_correct_num*self.exam.coding_question_score
 
-class StudentInfoImporter(models.Model):
+
+def validate_zipfile(value):
+    extension = value.name.split('.')[-1]
+    if extension not in ['zip',]:
+        raise ValidationError(
+            _(value.name+'不是zip压缩文件'),
+            params={'value': value.name},
+        )
+
+def validate_txtfile(value):
+    extension = value.name.split('.')[-1]
+    if extension not in ['txt',]:
+        raise ValidationError(
+            _(value.name+'不是txt文件'),
+            params={'value': value.name},
+        )
+
+def validate_cfile(value):
+    extension = value.name.split('.')[-1]
+    if extension not in ['c',]:
+        raise ValidationError(
+            _(value.name+'不是c文件'),
+            params={'value': value.name},
+        )
+
+def validate_csvfile(value):
+    extension = value.name.split('.')[-1]
+    if extension not in ['csv',]:
+        raise ValidationError(
+            _(value.name+'不是csv文件'),
+            params={'value': value.name},
+        )
+
+
+
+class ChoiceQuestion(models.Model):
     class Meta:
-        verbose_name = '导入考生信息'
-        verbose_name_plural = '导入考生信息'
+        verbose_name = '题目-选择题'
+        verbose_name_plural = '题目-选择题'
 
     def __str__(self):
-        return '导入考生信息'+str(self.id)
+        return '选择题-'+str(self.id)
+
+    problem_type = models.CharField("试卷类型", max_length=20, choices=EXAM_TYPE_CHOICES, default='1')
+
+    question_text = models.TextField('题干')
+    choice_1 = models.CharField('选项1', max_length=200,  default='')
+    choice_2 = models.CharField('选项2', max_length=200,  default='')
+    choice_3 = models.CharField('选项3', max_length=200,  default='')
+    choice_4 = models.CharField('选项4', max_length=200,  default='')
+
+    answer = models.CharField("正确选项", max_length=2, choices=ANSWER_CHOICES, default='1')
+
+    def question_html_(self):
+        question_text = [x for x in self.question_text.split('\n')]
+        return format_html_join(
+                '', '<p style="color:{};">{}</p>',
+                (('black', x) for x in question_text)
+                )
+    question_html_.short_description = '题目'
+
+    def answer_list_(self):
+        choice_list = [
+            ['white', 'A. '+ self.choice_1], 
+            ['white', 'B. '+  self.choice_2], 
+            ['white', 'C. '+  self.choice_3], 
+            ['white', 'D. '+  self.choice_4], 
+            ]
+        choice_list[int(self.answer)-1][0] = 'Lime'
+
+        return format_html("<ul>") + \
+                format_html_join(
+                '\n', '<li style="background-color:{};">{}</li>',
+                ((x[0], x[1]) for x in choice_list)
+                ) \
+                + format_html("</ul>")
+    answer_list_.short_description = '题目选项'
+
+
+class CodingQuestion(models.Model):
+    class Meta:
+        verbose_name = '题目-编程题'
+        verbose_name_plural = '题目-编程题'
+
+    def __str__(self):
+        return '编程题-'+str(self.id)
+
+    problem_type = models.CharField("试卷类型", max_length=20, choices=EXAM_TYPE_CHOICES, default='1')
+    question_text = models.TextField('题目简介', )
+    # upload_zipfile = models.FileField(upload_to='upload_zipfile/', null=True, blank=True, 
+    # validators=[validate_zipfile], verbose_name='上传题目文件zip压缩包')
+
+    upload_description_file = models.FileField(upload_to='upload_c_file/', null=True, blank=True, 
+    validators=[validate_txtfile], verbose_name='上传题目描述[.txt文件]')
+
+    upload_c_file = models.FileField(upload_to='upload_c_file/', null=True, blank=True, 
+    validators=[validate_cfile], verbose_name='上传C文件[.c文件]')
+
+    upload_input_file = models.FileField(upload_to='upload_answer_file/', null=True, blank=True, 
+    validators=[validate_txtfile], verbose_name='上传题目输入[.txt文件]')
+
+    upload_answer_file = models.FileField(upload_to='upload_answer_file/', null=True, blank=True, 
+    validators=[validate_txtfile], verbose_name='上传题目输出[.txt文件]')
+
+    def question_html_(self):
+        try:
+            with open(self.upload_description_file.path,'r', encoding='utf-8') as f:
+                lines = f.readlines()
+                return format_html_join(
+                        '', '<p style="color:{};">{}</p>',
+                        (('black', x) for x in lines)
+                        )
+        except:
+            return ''
+    question_html_.short_description = '题目'
+
+    def code_html_(self):
+        try:
+            with open(self.upload_c_file.path,'r', encoding='utf-8') as f:
+                lines = f.readlines()
+                return format_html_join(
+                        '', '<p style="color:{};">{}</p>',
+                        (('black', x) for x in lines)
+                        )
+        except:
+            return ''
+    code_html_.short_description = '代码'
+
+    def zip_path_(self):
+        try:
+            c_path, input_path = self.upload_c_file.path, self.upload_input_file.path
+            paths = os.path.split(input_path)
+            return os.path.sep.join([paths[0], 'coding-'+str(self.id)+'.zip'])
+        except:
+            return ''
+    zip_path_.short_description = '压缩文件'
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  
+        zip_path = self.zip_path_()
+        if zip_path:
+            if os.path.exists(zip_path): os.remove(zip_path)
+            c_path, input_path = self.upload_c_file.path, self.upload_input_file.path
+            print(zip_path)
+            zf = zipfile.ZipFile(zip_path, 'w')
+            zf.write(c_path,'{}/main.c'.format('coding'))
+            zf.write(input_path,'{}/input.txt'.format('coding'))
+            zf.close()
+
+
+
+class StudentInfoImporter(models.Model):
+    class Meta:
+        verbose_name = '考试-批量导入考生'
+        verbose_name_plural = '考试-批量导入考生'
+
+    def __str__(self):
+        return '导入考生-'+str(self.id)
 
     upload_description_file = models.FileField(upload_to='upload_student_list/', null=True, blank=True, 
     validators=[validate_txtfile], verbose_name='上传考生信息文件[.txt]')

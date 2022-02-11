@@ -18,8 +18,8 @@ class StudentAdmin(admin.ModelAdmin):
 
 
 class ExamAdmin(admin.ModelAdmin):
-        list_display = ('id_', 'problem_type', 'info_text','all_question_stat_','out_link_',)
-
+        list_display = ('id_', 'opened','problem_type', 'info_text','all_question_stat_','out_link_',)
+        list_editable = ( 'opened',)
 
 class ExamPaperAdmin(admin.ModelAdmin):
         list_display = ('__str__', 'problem_type', 'student', 'exam', 'start_time_')
@@ -33,3 +33,5 @@ admin.site.register(ExamPaper, ExamPaperAdmin)
 admin.site.register(ChoiceQuestion, ChoiceQuestionAdmin)
 admin.site.register(CodingQuestion, CodingQuestionAdmin)
 
+admin.site.site_title = "C语言期末考试后台管理系统"
+admin.site.site_header = "C语言期末考试后台管理系统"
