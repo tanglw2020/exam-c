@@ -56,7 +56,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="#">C语言等级考试</a>
+        <a class="navbar-brand" href="#">C语言期末考试</a>
       </div>
       <div id="navbar" class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
@@ -73,12 +73,20 @@
 
     <div class="card" style="width: 90%;">
       <div class="card-body">
-        <p></p>
-        <p>考生班级： {{ student.class_name }}</p>
-        <p>考生姓名： {{ student.student_name }}</p>
-        <p>考试科目： {{ exam.exam_type_ }} </p>
+        {% if not exam_page.enabled %}
+        <h3>{{ exam.exam_type_ }}期末考试(交卷成功，不能再作答)</h3>
+        {% else %}
+        <h3>{{ exam.exam_type_ }}期末考试</h3>
+        {% endif %}
+        <p>考场编号： {{ exam.id }}</p>
+        <p>考生信息： {{ student.class_name }}--{{ student.student_name }}--{{ student.student_id }}</p>
+        {% if exam_page.add_time %}
+        <p>考试时长： {{ exam.period_ }}+延时{{ exam_page.add_time }}分钟 </p>
+        {% else %}
         <p>考试时长： {{ exam.period_ }} </p>
-        <p id="serverTime">考试用时:</p>
+        {% endif %}
+
+        <strong>剩余时间： <span id="usedTime"></span></strong>
       </div>
     </div>
 
@@ -111,10 +119,17 @@
     <div class="alert alert-primary" role="alert">
       <form action="" method="post">
         <p>第{{ choice_question_id }}题：{{ choice_question.question_text |linebreaks }} </p>
+        {% if exam_page.enabled %}
         <label><input name="Choice" type="radio" id='choice1' /> {{ choice_question.choice_1 }} </label> </br>
         <label><input name="Choice" type="radio" id='choice2' /> {{ choice_question.choice_2 }} </label> </br>
         <label><input name="Choice" type="radio" id='choice3' /> {{ choice_question.choice_3 }} </label> </br>
         <label><input name="Choice" type="radio" id='choice4' /> {{ choice_question.choice_4 }} </label> </br>
+        {% else %}
+        <label><input name="Choice" type="radio" id='choice1' disabled /> {{ choice_question.choice_1 }} </label> </br>
+        <label><input name="Choice" type="radio" id='choice2' disabled /> {{ choice_question.choice_2 }} </label> </br>
+        <label><input name="Choice" type="radio" id='choice3' disabled /> {{ choice_question.choice_3 }} </label> </br>
+        <label><input name="Choice" type="radio" id='choice4' disabled /> {{ choice_question.choice_4 }} </label> </br>
+        {% endif %}
       </form>
 
       <p>当前选择：<span id="current_ans">
@@ -185,13 +200,17 @@
         timeout: 10000,
         success: function (result) {
           if (result.result) {
-            $("#serverTime").html("考试用时：" + result.result);
-          } else {
-            $("#serverTime").html("无效数据");
+            $("#usedTime").html(result.result);
+            if (result.color) {
+              $("#usedTime").css({ 'color': result.color });
+            }
+            if (result.refresh) {
+              location.reload();
+            }
           }
         }
       });
-      setTimeout('refreshTime()', 5000);
+      setTimeout('refreshTime()', 1000);
     }
     setTimeout('refreshTime()', 10);
   </script>

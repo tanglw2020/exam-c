@@ -84,6 +84,8 @@ def exampage_coding_question(request, exampage_id, coding_question_id):
             exam_page.update_coding_question_answer_result_(coding_question_id, output_save_path)
     else:
         form = UploadOutputFileForm()
+    if not exam_page.enabled:
+        form.fields['file'].widget.attrs['disabled'] = True
 
     context = {
         'exam': exam_page.exam,
@@ -219,6 +221,7 @@ def login_second(request, exampage_id):
     return render(request, 'exam_c/login_second.html', context)
 
 
+
 @csrf_exempt
 def api_get_server_time(request, exampage_id):
 
@@ -228,8 +231,26 @@ def api_get_server_time(request, exampage_id):
         a = {"result":"null"}
         return HttpResponse(json.dumps(a), content_type='application/json')
 
+    # start_time = exam_page.start_time.replace(tzinfo=None)
     diff = int(timezone.now().timestamp() - exam_page.start_time.timestamp())
+    if not exam_page.enabled:
+        diff = 0
+    elif exam_page.exam.period == '2':
+        diff = (90+exam_page.add_time)*60 - diff
+    elif exam_page.exam.period == '1':
+        diff = (120+exam_page.add_time)*60 - diff
+
     a = {}
+    a["refresh"] = 0
+    a["color"] = 'black'
+    if diff < 60*5: 
+        a["color"] = 'red'
+    if diff < 0:  
+        diff = 0
+        if exam_page.enabled:
+            exam_page.disable_()
+            a["refresh"] = 1  
+
     a["result"] = str(int(diff/60))+'分钟'+str(diff%60)+'秒'  ##"post_success"
     return HttpResponse(json.dumps(a), content_type='application/json')
 
@@ -300,3 +321,33 @@ def api_download_coding_zipfile(request, exampage_id, coding_question_id):
     else:
         a = {"result":"null"}
         return HttpResponse(json.dumps(a), content_type='application/json')
+
+
+
+@csrf_exempt
+def api_submit_all(request, exampage_id):
+
+    try:
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
+    except ExamPaper.DoesNotExist:
+        a = {"result":"null"}
+        return HttpResponse(json.dumps(a), content_type='application/json')
+    
+    if exam_page.enabled:
+        exam_page.disable_()
+    a = {"result":"null"}
+    return HttpResponse(json.dumps(a), content_type='application/json')
+
+
+@csrf_exempt
+def add_time_enable(request, exampage_id):
+
+    try:
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
+    except ExamPaper.DoesNotExist:
+        a = {"result":"null"}
+        return HttpResponse(json.dumps(a), content_type='application/json')
+    
+    exam_page.add_time_enable_(3)
+    a = {"result":"null"}
+    return HttpResponse(json.dumps(a), content_type='application/json')

@@ -17,7 +17,7 @@ class StudentForm(forms.Form):
         exam_id = cleaned_data['exam_id']
         student_id = str(cleaned_data['student_id'])
 
-        if not Exam.objects.filter(id=exam_id).exists():
+        if not Exam.objects.filter(id=exam_id, opened=True).exists():
             self.add_error('exam_id', '考试编号不存在')
         if not Student.objects.filter(student_id=student_id).exists():
             self.add_error('student_id', '学号不存在')
