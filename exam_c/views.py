@@ -31,9 +31,14 @@ def exampage(request, exampage_id):
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('c:login'))
 
+    question_links = []
+    for a in exam_page.choice_question_answers_():
+        if a=='+': question_links.append('btn btn-light')
+        else: question_links.append('btn btn-success')
     context = {
         'exam': exam_page.exam,
         'student': exam_page.student,
+        'question_links': question_links,
         'exam_page': exam_page,
         'choice_questions_answers': exam_page.choice_question_answers_(),
         'coding_questions_answers': exam_page.coding_question_answers_(),
@@ -46,12 +51,19 @@ def exampage_choice_question(request, exampage_id, choice_question_id):
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('c:login'))
 
+    question_links = []
+    for a in exam_page.choice_question_answers_():
+        if a=='+': question_links.append('btn btn-light')
+        else: question_links.append('btn btn-success')
+    question_links[choice_question_id-1] = 'btn btn-primary'
+    current_choice = exam_page.choice_question_answers_()[choice_question_id-1]
+    if current_choice=='+': current_choice=''
     context = {
         'exam': exam_page.exam,
         'student': exam_page.student,
         'exam_page': exam_page,
-        'choice_questions_answers': exam_page.choice_question_answers_(),
-        'coding_questions_answers': exam_page.coding_question_answers_(),
+        'question_links': question_links,
+        'current_choice': current_choice,
         'choice_question': exam_page.choice_questions_pk_(choice_question_id),
         'choice_question_id': choice_question_id,
         }
@@ -69,7 +81,8 @@ def exampage_coding_question(request, exampage_id, coding_question_id):
         exam_page = ExamPaper.objects.get(unique_key=exampage_id)
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('c:login'))
-
+    
+    uploadsucc = False
     coding_question = exam_page.coding_questions_pk_(coding_question_id)
     if request.method == 'POST':
         form = UploadOutputFileForm(request.POST, request.FILES)
@@ -82,6 +95,7 @@ def exampage_coding_question(request, exampage_id, coding_question_id):
             # exam_page.coding_question_answers = ','.join(old_answers)
             # exam_page.save()
             exam_page.update_coding_question_answer_result_(coding_question_id, output_save_path)
+            uploadsucc = True
     else:
         form = UploadOutputFileForm()
     if not exam_page.enabled:
@@ -95,6 +109,7 @@ def exampage_coding_question(request, exampage_id, coding_question_id):
         'coding_questions_answers': exam_page.coding_question_answers_(),
         'coding_question': exam_page.coding_questions_pk_(coding_question_id),
         'coding_question_id': coding_question_id,
+        'uploadsucc': uploadsucc,
         'form': form,
         }
     return render(request, 'exam_c/exam_page_coding_question.html', context)

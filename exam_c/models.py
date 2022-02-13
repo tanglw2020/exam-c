@@ -203,7 +203,7 @@ class ExamPaper(models.Model):
     coding_questions_pk_.short_description = 'pk编程题'
 
     def coding_output_path_(self, question_id):
-        output_save_path = os.path.join(MEDIA_ROOT, 'upload_output','coding_output_{}_{}.txt'.format(self.id, question_id))
+        output_save_path = os.path.join(MEDIA_ROOT, 'upload_output','coding_output_{}_{}.txt'.format(self.unique_key, question_id))
         return output_save_path
     coding_output_path_.short_description = '上传结果保存目录'
 
@@ -245,6 +245,7 @@ class ExamPaper(models.Model):
         min_len = min(len(answers), len(outputs))
         correct_cnt = 0
         for i in range(min_len):
+            print(answers[i], outputs[i])
             if answers[i] == outputs[i]: correct_cnt = correct_cnt + 1
         score = str(correct_cnt*1.0/len(answers))
         old_answers = self.coding_question_results.split(',')

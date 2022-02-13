@@ -92,15 +92,9 @@
       <div class="card-body">
         <h2 class="card-title">选择题</h2>
         <div class="btn-group" role="group" aria-label="choice questions">
-          {% for a in choice_questions_answers %}
-          {% if a == '+' %}
-          <a class="btn btn-light" href="{% url 'c:exampage-choicequestion'  exam_page.unique_key  forloop.counter %}">
+          {% for a in question_links %}
+          <a class="{{ a }}" href="{% url 'c:exampage-choicequestion'  exam_page.unique_key  forloop.counter %}">
             题{{ forloop.counter }}</a>
-          {% else %}
-          <a class="btn btn-success"
-            href="{% url 'c:exampage-choicequestion'  exam_page.unique_key  forloop.counter %}">
-            题{{ forloop.counter }}</a>
-          {% endif %}
           {% endfor %}
         </div>
       </div>
