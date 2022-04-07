@@ -41,7 +41,16 @@
       padding: 40px 15px;
       text-align: center;
     }
+
+    .box {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
   </style>
+
+
 </head>
 
 <body>
@@ -56,13 +65,11 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="#">C语言期末考试</a>
+        <a class="navbar-brand" href="{% url 'c:exampage'  exam_page.unique_key %}">C语言期末考试</a>
       </div>
       <div id="navbar" class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
-          <li><a href="{% url 'c:exampage'  exam_page.unique_key %}">首页</a></li>
           <li class="active"><a href="{% url 'c:exampage-choicequestion'  exam_page.unique_key  1 %}">选择题</a></li>
-          <li><a href="{% url 'c:exampage-codingquestion'  exam_page.unique_key  1 %}">编程题</a></li>
         </ul>
       </div>
       <!--/.nav-collapse -->
@@ -87,6 +94,7 @@
         {% endif %}
 
         <strong>剩余时间： <span id="usedTime"></span></strong>
+        <strong>窗口大小： <span id="wsize"></span></strong>
       </div>
     </div>
 
@@ -108,7 +116,9 @@
 
     <div class="alert alert-primary" role="alert">
       <form action="" method="post">
-        <p>第{{ choice_question_id }}题：{{ choice_question.question_text |linebreaks }} </p>
+        <div class="box">
+          <p>第{{ choice_question_id }}题：{{ choice_question.question_text |linebreaks }} </p>
+        </div>
         {% if exam_page.enabled %}
         <label><input name="Choice" type="radio" id='choice1' /> {{ choice_question.choice_1 }} </label> </br>
         <label><input name="Choice" type="radio" id='choice2' /> {{ choice_question.choice_2 }} </label> </br>
@@ -138,6 +148,33 @@
   <script src="{% static 'exam_c/js/bootstrap.min.js' %}"></script>
   <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
   <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
+
+  <script type="text/javascript">
+    function launchFullscreen(element) {
+      if (element.requestFullscreen) {
+        element.requestFullscreen();
+      } else if (element.mozRequestFullScreen) {
+        element.mozRequestFullScreen();
+      } else if (element.msRequestFullscreen) {
+        element.msRequestFullscreen();
+      } else if (element.webkitRequestFullscreen) {
+        element.webkitRequestFullScreen();
+      }
+    }
+    launchFullscreen(document.documentElement);
+
+    function checkFullscreen() {
+
+      console.log("info:" + window.outerHeight + " " + window.outerWidth);
+      console.log("info:" + window.innerHeight + " " + window.innerWidth);
+      console.log("info:" + window.screen.height + " " + window.screen.width);
+      $("#wsize").html(window.innerHeight + " " + window.innerWidth + " " + window.screen.height + " " + window.screen.width);
+      setTimeout('checkFullscreen()', 5000);
+    }
+    setTimeout('checkFullscreen()', 10);
+
+  </script>
+
 
   <script type="text/javascript">
     function sendChoiceAnswer(choice_id) {
