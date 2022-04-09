@@ -358,7 +358,7 @@ class CodingQuestion(models.Model):
         verbose_name_plural = '题目-编程题'
 
     def __str__(self):
-        return '编程题-'+str(self.id)
+        return str(self.id)+"-"+self.question_text
 
     problem_type = models.CharField("试卷类型", max_length=20, choices=EXAM_TYPE_CHOICES, default='1')
     question_text = models.TextField('题目简介', )
