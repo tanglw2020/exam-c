@@ -1,0 +1,4 @@
+在函数Func中实现功能：统计字符串中单词的个数，并返回结果。
+例1： s = " it is here ", 结果是3.
+例2： s = "that sounds great !!", 结果是3.
+例3： s = " yes,that sounds great !!", 结果是4.
