@@ -285,6 +285,21 @@ def api_handle_choice_answer(request, exampage_id, choice_question_id, choice_id
     a = {}
     return HttpResponse(json.dumps(a), content_type='application/json')
 
+
+@csrf_exempt
+def api_get_choice_text(request, exampage_id, choice_question_id):
+
+    try:
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
+    except ExamPaper.DoesNotExist:
+        a = {"result":"null"}
+        return HttpResponse(json.dumps(a), content_type='application/json')
+    question_text = exam_page.choice_questions_pk_(choice_question_id).question_text
+    question_text = question_text.replace('\n','<br>')
+    a = {"result": question_text}
+    return HttpResponse(json.dumps(a), content_type='application/json')
+
+
 @csrf_exempt
 def api_download_scorelist(request, exam_id):
     try:

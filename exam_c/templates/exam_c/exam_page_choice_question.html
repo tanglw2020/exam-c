@@ -51,6 +51,7 @@
   </style>
 
 
+
 </head>
 
 <body>
@@ -114,10 +115,11 @@
 
     <HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )" width="100%" color=#987 cb 9 SIZE=20>
 
-    <div class="alert alert-primary" role="alert">
+    <div class="alert alert-primary" role="alert" id="qform" style="visibility: hidden;">
       <form action="" method="post">
         <div class="box">
-          <p>第{{ choice_question_id }}题：{{ choice_question.question_text |linebreaks }} </p>
+          第{{ choice_question_id }}题：
+          <div id="qtext"></div>
         </div>
         {% if exam_page.enabled %}
         <label><input name="Choice" type="radio" id='choice1' /> {{ choice_question.choice_1 }} </label> </br>
@@ -149,30 +151,40 @@
   <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
   <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
 
+
   <script type="text/javascript">
-    function launchFullscreen(element) {
-      if (element.requestFullscreen) {
-        element.requestFullscreen();
-      } else if (element.mozRequestFullScreen) {
-        element.mozRequestFullScreen();
-      } else if (element.msRequestFullscreen) {
-        element.msRequestFullscreen();
-      } else if (element.webkitRequestFullscreen) {
-        element.webkitRequestFullScreen();
-      }
-    }
-    launchFullscreen(document.documentElement);
 
     function checkFullscreen() {
-
-      console.log("info:" + window.outerHeight + " " + window.outerWidth);
-      console.log("info:" + window.innerHeight + " " + window.innerWidth);
-      console.log("info:" + window.screen.height + " " + window.screen.width);
-      $("#wsize").html(window.innerHeight + " " + window.innerWidth + " " + window.screen.height + " " + window.screen.width);
-      setTimeout('checkFullscreen()', 5000);
+      $("#wsize").html(window.innerHeight + " " + window.innerWidth + " "
+        + window.screen.height + " " + window.screen.width);
+      if ((window.innerHeight >= window.screen.height - 10) && (window.innerHeight <= window.screen.height + 10)) {
+        $("#qform").css("visibility", "visible");
+      }
+      else {
+        $("#qform").css("visibility", "hidden");
+      }
+      setTimeout('checkFullscreen()', 200);
     }
     setTimeout('checkFullscreen()', 10);
+  </script>
 
+  <script type="text/javascript">
+    function getqText() {
+      $.ajax({
+        url: "{% url 'c:api-choicetext'  exam_page.unique_key choice_question_id %}",
+        type: 'POST',
+        data: {},
+        dataType: 'json',
+        timeout: 10000,
+        success: function (result) {
+          if (result.result) {
+            $("#qtext").html(result.result);
+          }
+        }
+      });
+    }
+
+    getqText();
   </script>
 
 
@@ -185,9 +197,6 @@
         dataType: 'json',
         timeout: 10000,
         success: function (result) {
-          // if (result.result) {
-          //   $("#serverTime").html("考试用时：" + result.result);
-          // } 
         }
       });
     }
@@ -236,6 +245,11 @@
     }
     setTimeout('refreshTime()', 10);
   </script>
+
+  <script type="text/javascript">
+    $('#qform').css("visibility", "hidden");
+  </script>
+
 </body>
 
 </html>
