@@ -127,6 +127,7 @@ class ExamPaper(models.Model):
     end_time = models.DateTimeField('交卷时间', null=True, blank=True, default=timezone.now)
     add_time = models.IntegerField("附加延时[分]", default=0)
     enabled = models.BooleanField("是否可以作答?", default=True)
+    choice_question_finished = models.BooleanField("选择题是否结束作答?", default=False)
 
     student_id_local = models.CharField('学号', max_length=20, default='')
     exam_id_local = models.CharField('考场号', max_length=20, default='')

@@ -48,6 +48,20 @@
       -ms-user-select: none;
       user-select: none;
     }
+
+    .btn-end {
+      background-color: white;
+      color: green;
+      padding: 2px 2px;
+      margin-top: 2px;
+    }
+
+    .btn-end:disabled {
+      background-color: gray;
+      color: gainsboro;
+      padding: 2px 2px;
+      margin-top: 2px;
+    }
   </style>
 
 
@@ -95,15 +109,31 @@
         {% endif %}
 
         <strong>剩余时间： <span id="usedTime"></span></strong>
-        <strong>窗口大小： <span id="wsize"></span></strong>
+        <strong>窗口大小： <span id="wsize" style="visibility: visible;"></span></strong>
       </div>
     </div>
 
     <HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )" width="100%" color=#987 cb 9 SIZE=20>
 
     <div class="card" style="width: 90%;">
+      <h3 style="color: red;">注意：</h3>
+      <p><strong>1. 使用F11可以进入或退出全屏模式</strong></p>
+      <p><strong>2. 在整个选择题过程中必须处于全屏模式，且浏览器缩放比例保持100%</strong></p>
+      <p><strong>3. 点击【结束作答】才能开始其他题型，同时选择题不能再修改</strong></p>
+    </div>
+
+    <HR style=" FILTER: alpha (opacity = 100, finishopacity =0 , style= 2 )" width="100%" color=#987 cb 9 SIZE=20>
+
+    <div class="card" style="width: 90%;">
       <div class="card-body">
-        <h2 class="card-title">选择题</h2>
+        <h2 class="card-title">选择题
+          {% if exam_page.enabled and not exam_page.choice_question_finished %}
+          <button id="end-choice" class="btn-end" onclick="end_choice_question()"
+            style="margin:16px 20px">>结束作答</button>
+          {% else %}
+          <button id="end-choice" class="btn-end" onclick="back_index()" style="margin:16px 20px">>返回首页</button>
+          {% endif %}
+        </h2>
         <div class="btn-group" role="group" aria-label="choice questions">
           {% for a in question_links %}
           <a class="{{ a }}" href="{% url 'c:exampage-choicequestion'  exam_page.unique_key  forloop.counter %}">
@@ -121,7 +151,7 @@
           第{{ choice_question_id }}题：
           <div id="qtext"></div>
         </div>
-        {% if exam_page.enabled %}
+        {% if exam_page.enabled and not exam_page.choice_question_finished %}
         <label><input name="Choice" type="radio" id='choice1' /> {{ choice_question.choice_1 }} </label> </br>
         <label><input name="Choice" type="radio" id='choice2' /> {{ choice_question.choice_2 }} </label> </br>
         <label><input name="Choice" type="radio" id='choice3' /> {{ choice_question.choice_3 }} </label> </br>
@@ -185,6 +215,33 @@
     }
 
     getqText();
+  </script>
+
+
+  <script type="text/javascript">
+
+    function end_choice_question() {
+      var Val = confirm("确认结束选择题作答?");
+      if (Val == true) {
+        $.ajax({
+          url: "{% url 'c:api-setchoicefinished'  exam_page.unique_key %}",
+          type: 'POST',
+          data: {},
+          dataType: 'json',
+          timeout: 10000,
+          success: function (result) {
+            if (result.result == 'ok') {
+              window.location.href = "{% url 'c:exampage'  exam_page.unique_key %}";
+            }
+          }
+        });
+      }
+    }
+
+    function back_index() {
+      window.location.href = "{% url 'c:exampage'  exam_page.unique_key %}";
+    }
+
   </script>
 
 
