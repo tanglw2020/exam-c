@@ -51,6 +51,7 @@ def exampage_choice_question(request, exampage_id, choice_question_id):
     except ExamPaper.DoesNotExist:
         return HttpResponseRedirect(reverse('c:login'))
 
+    choice_question_id = 1  # fix the id 
     question_links = []
     for a in exam_page.choice_question_answers_():
         if a=='+': question_links.append('btn btn-light')
@@ -294,9 +295,17 @@ def api_get_choice_text(request, exampage_id, choice_question_id):
     except ExamPaper.DoesNotExist:
         a = {"result":"null"}
         return HttpResponse(json.dumps(a), content_type='application/json')
-    question_text = exam_page.choice_questions_pk_(choice_question_id).question_text
-    question_text = question_text.replace('\n','<br>')
-    a = {"result": question_text}
+    question = exam_page.choice_questions_pk_(choice_question_id)
+    question_text = question.question_text.replace('\n','<br>')
+    answer = exam_page.choice_question_answers_()[choice_question_id-1]
+    if answer == '+': answer = ''
+    a = {"result": question_text, 
+        "choice1":question.choice_1, 
+        "choice2":question.choice_2, 
+        "choice3":question.choice_3, 
+        "choice4":question.choice_4, 
+        "answer": answer
+        }
     return HttpResponse(json.dumps(a), content_type='application/json')
 
 

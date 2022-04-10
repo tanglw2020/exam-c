@@ -135,8 +135,8 @@
         </h2>
         <div class="btn-group" role="group" aria-label="choice questions">
           {% for a in question_links %}
-          <a class="{{ a }}" href="{% url 'c:exampage-choicequestion'  exam_page.unique_key  forloop.counter %}">
-            题{{ forloop.counter }}</a>
+          <button id="jump{{ forloop.counter }}" class="{{ a }}" onclick="jump2Question('{{ forloop.counter }}')">
+            题{{ forloop.counter }}</button>
           {% endfor %}
         </div>
       </div>
@@ -151,15 +151,15 @@
           <div id="qtext"></div>
         </div>
         {% if exam_page.enabled and not exam_page.choice_question_finished %}
-        <label><input name="Choice" type="radio" id='choice1' /> {{ choice_question.choice_1 }} </label> </br>
-        <label><input name="Choice" type="radio" id='choice2' /> {{ choice_question.choice_2 }} </label> </br>
-        <label><input name="Choice" type="radio" id='choice3' /> {{ choice_question.choice_3 }} </label> </br>
-        <label><input name="Choice" type="radio" id='choice4' /> {{ choice_question.choice_4 }} </label> </br>
+        <label><input name="Choice" type="radio" id='choice1' /> <span id="pchoice1"></span></label> </br>
+        <label><input name="Choice" type="radio" id='choice2' /> <span id="pchoice2"></span></label> </br>
+        <label><input name="Choice" type="radio" id='choice3' /> <span id="pchoice3"></span></label> </br>
+        <label><input name="Choice" type="radio" id='choice4' /> <span id="pchoice4"></span></label> </br>
         {% else %}
-        <label><input name="Choice" type="radio" id='choice1' disabled /> {{ choice_question.choice_1 }} </label> </br>
-        <label><input name="Choice" type="radio" id='choice2' disabled /> {{ choice_question.choice_2 }} </label> </br>
-        <label><input name="Choice" type="radio" id='choice3' disabled /> {{ choice_question.choice_3 }} </label> </br>
-        <label><input name="Choice" type="radio" id='choice4' disabled /> {{ choice_question.choice_4 }} </label> </br>
+        <label><input name="Choice" type="radio" id='choice1' disabled /> <span id="pchoice1"></span></label> </br>
+        <label><input name="Choice" type="radio" id='choice2' disabled /> <span id="pchoice2"></span></label> </br>
+        <label><input name="Choice" type="radio" id='choice3' disabled /> <span id="pchoice3"></span></label> </br>
+        <label><input name="Choice" type="radio" id='choice4' disabled /> <span id="pchoice4"></span></label> </br>
         {% endif %}
       </form>
 
@@ -182,7 +182,12 @@
 
 
   <script type="text/javascript">
+    // initial the state
+    window.cur_question_id = 1;
+    window.cur_ans = 0;
+  </script>
 
+  <script type="text/javascript">
     function checkFullscreen() {
       // $("#wsize").html('窗口大小：'+window.innerHeight + " " + window.innerWidth + " "
       //   + window.screen.height + " " + window.screen.width);
@@ -198,9 +203,9 @@
   </script>
 
   <script type="text/javascript">
-    function getqText() {
+    function getqText(question_id) {
       $.ajax({
-        url: "{% url 'c:api-choicetext'  exam_page.unique_key choice_question_id %}",
+        url: '/c/api/getchoicetext/{{ exam_page.unique_key }}/' + question_id,
         type: 'POST',
         data: {},
         dataType: 'json',
@@ -208,12 +213,36 @@
         success: function (result) {
           if (result.result) {
             $("#qtext").html(result.result);
+            $("#pchoice1").html(result.choice1);
+            $("#pchoice2").html(result.choice2);
+            $("#pchoice3").html(result.choice3);
+            $("#pchoice4").html(result.choice4);
+            $("#current_ans").html(result.answer);
+            if (result.answer) window.cur_ans = 1;
           }
         }
       });
     }
+    getqText(window.cur_question_id);
+  </script>
 
-    getqText();
+  <script type="text/javascript">
+
+    function jump2Question(question_id) {
+      if (window.cur_ans == 1) {
+        window.cur_ans = 0;
+        $("#jump" + window.cur_question_id).attr("class", "btn btn-success");
+      }
+      else {
+        $("#jump" + window.cur_question_id).attr("class", "btn btn-light");
+      }
+
+      $("#jump" + question_id).attr("class", "btn btn-primary");
+      $('input[type=radio]:checked').prop("checked", false);
+
+      getqText(question_id);
+      window.cur_question_id = question_id;
+    }
   </script>
 
 
@@ -240,39 +269,34 @@
     function back_index() {
       window.location.href = "{% url 'c:exampage'  exam_page.unique_key %}";
     }
-
   </script>
 
 
   <script type="text/javascript">
     function sendChoiceAnswer(choice_id) {
       $.ajax({
-        url: '/c/api/sendchoiceanswer/{{ exam_page.unique_key }}/{{ choice_question_id }}/' + choice_id,
+        url: '/c/api/sendchoiceanswer/{{ exam_page.unique_key }}/' + window.cur_question_id + '/' + choice_id,
         type: 'POST',
         data: {},
         dataType: 'json',
         timeout: 10000,
         success: function (result) {
+          window.cur_ans = 1;
+          $("#current_ans").html(choice_id);
         }
       });
     }
-  </script>
 
-  <script type="text/javascript">
     $('#choice1').on('click', function () {
-      $("#current_ans").html("1");
       sendChoiceAnswer(1);
     });
     $('#choice2').on('click', function () {
-      $("#current_ans").html("2");
       sendChoiceAnswer(2);
     });
     $('#choice3').on('click', function () {
-      $("#current_ans").html("3");
       sendChoiceAnswer(3);
     });
     $('#choice4').on('click', function () {
-      $("#current_ans").html("4");
       sendChoiceAnswer(4);
     });
   </script>
@@ -300,10 +324,6 @@
       setTimeout('refreshTime()', 1000);
     }
     setTimeout('refreshTime()', 10);
-  </script>
-
-  <script type="text/javascript">
-    $('#qform').css("visibility", "hidden");
   </script>
 
 </body>
