@@ -110,6 +110,7 @@
           <td>选择题</td>
           <td>编程题</td>
           <td>总分</td>
+          <td>是否交卷</td>
         </tr>
         {% for exam_paper in exam_papers %}
         <tr>
@@ -121,6 +122,7 @@
           <td>{{ exam_paper.choice_question_results }}</td>
           <td>{{ exam_paper.coding_question_result_detail }}</td>
           <td>{{ exam_paper.total_score }}</td>
+          <td>{{ exam_paper.is_ended_ }}</td>
         </tr>
         {% endfor %}
       </table>

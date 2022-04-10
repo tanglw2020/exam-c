@@ -143,6 +143,12 @@ class ExamPaper(models.Model):
     coding_question_results = models.TextField("编程题评分", max_length=1000, blank=True, default='')
 
 
+    def is_ended_(self):
+        if self.enabled:
+            return "否"
+        else:
+            return "是"
+
     def is_empty_(self):
         if self.exam.choice_question_num:
             if len(self.choice_questions)<1: return True
