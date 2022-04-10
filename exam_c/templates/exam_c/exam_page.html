@@ -103,11 +103,7 @@
     <div class="card" style="width: 90%;">
       <div class="card-body">
         <h2 class="card-title">选择题
-          {% if not exam_page.choice_question_finished %}
-          <button id="start-choice" class="btn-start" style="margin:16px 20px">>开始作答</button>
-          {% else %}
-          <button id="start-choice" class="btn-start" style="margin:16px 20px">>查看作答</button>
-          {% endif %}
+          <button id="start-choice" class="btn-start" style="margin:16px 20px">>>></button>
         </h2>
         <div class="btn-group" role="group" aria-label="choice questions">
           {% for a in question_links %}
@@ -124,9 +120,9 @@
       <div class="card-body">
         <h2 class="card-title">编程题
           {% if exam_page.choice_question_finished %}
-          <button id="start-coding" class="btn-start" style="margin:16px 20px">>开始作答</button>
+          <button id="start-coding" class="btn-start" style="margin:16px 20px">>>></button>
           {% else %}
-          <button id="start-coding" class="btn-start" style="margin:16px 20px" disabled>>开始作答</button>
+          <button id="start-coding" class="btn-start" style="margin:16px 20px" disabled>>>></button>
           {% endif %}
         </h2>
         <div class="btn-group" role="group" aria-label="coding questions">

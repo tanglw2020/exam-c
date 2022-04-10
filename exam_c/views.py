@@ -133,7 +133,7 @@ def exam_room(request, exam_id):
     except Exam.DoesNotExist:
         raise Http404("exam does not exist")
     
-    exam_papers = exam.exampaper_set.all()
+    exam_papers = exam.exampaper_set.order_by('student_id')
     # for exam_paper in exam_papers:
         # print(exam_paper.student, exam_paper.student.id)
     context = {
@@ -327,7 +327,7 @@ def api_download_scorelist(request, exam_id):
     for i,exam_paper in enumerate(exam_papers):
         one_line = ' '.join([str(i), exam_paper.student.class_name, exam_paper.student.student_name, 
         exam_paper.student.student_id,
-        str(exam_paper.choice_question_result_stat()).replace(' ',''),
+        str(exam_paper.choice_question_results),
         str(exam_paper.coding_question_result_detail()).replace(' ',''),
         str(exam_paper.total_score()) ])
         # print(one_line)

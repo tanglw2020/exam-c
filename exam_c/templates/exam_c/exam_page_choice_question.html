@@ -84,7 +84,7 @@
       </div>
       <div id="navbar" class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
-          <li class="active"><a href="{% url 'c:exampage-choicequestion'  exam_page.unique_key  1 %}">选择题</a></li>
+          <li class="active"><a href="#">选择题</a></li>
         </ul>
       </div>
       <!--/.nav-collapse -->
@@ -109,7 +109,7 @@
         {% endif %}
 
         <strong>剩余时间： <span id="usedTime"></span></strong>
-        <strong>窗口大小： <span id="wsize" style="visibility: visible;"></span></strong>
+        <strong><span id="wsize" style="visibility: visible;"></span></strong>
       </div>
     </div>
 
@@ -128,10 +128,9 @@
       <div class="card-body">
         <h2 class="card-title">选择题
           {% if exam_page.enabled and not exam_page.choice_question_finished %}
-          <button id="end-choice" class="btn-end" onclick="end_choice_question()"
-            style="margin:16px 20px">>结束作答</button>
+          <button id="end-choice" class="btn-end" onclick="end_choice_question()" style="margin:16px 20px">结束作答</button>
           {% else %}
-          <button id="end-choice" class="btn-end" onclick="back_index()" style="margin:16px 20px">>返回首页</button>
+          <button id="end-choice" class="btn-end" onclick="back_index()" style="margin:16px 20px">返回首页</button>
           {% endif %}
         </h2>
         <div class="btn-group" role="group" aria-label="choice questions">
@@ -185,8 +184,8 @@
   <script type="text/javascript">
 
     function checkFullscreen() {
-      $("#wsize").html(window.innerHeight + " " + window.innerWidth + " "
-        + window.screen.height + " " + window.screen.width);
+      // $("#wsize").html('窗口大小：'+window.innerHeight + " " + window.innerWidth + " "
+      //   + window.screen.height + " " + window.screen.width);
       if ((window.innerHeight >= window.screen.height - 10) && (window.innerHeight <= window.screen.height + 10)) {
         $("#qform").css("visibility", "visible");
       }
