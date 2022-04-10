@@ -12,6 +12,8 @@ import shutil
 import datetime
 import zipfile
 from pathlib import Path
+from openpyxl import load_workbook, cell
+
 # Create your models here.
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -423,6 +425,10 @@ class CodingQuestion(models.Model):
             zf.close()
 
 
+Student_Type_CHOICES = (
+    ("师院一本","师院一本"),
+    ("南岳学院","南岳学院"),
+)
 
 class StudentInfoImporter(models.Model):
     class Meta:
@@ -432,70 +438,55 @@ class StudentInfoImporter(models.Model):
     def __str__(self):
         return '导入考生-'+str(self.id)
 
-    upload_description_file = models.FileField(upload_to='upload_student_list/', null=True, blank=True, 
-    validators=[validate_txtfile], verbose_name='上传考生信息文件[.txt]')
+    upload_description_file = models.FileField(upload_to='upload_student_list/', null=True, blank=True, verbose_name='上传考生信息文件')
+    student_type = models.CharField('学生来源', max_length=20, choices= Student_Type_CHOICES, default = "师院一本")
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)  # Call the "real" save() method.
         print(self.upload_description_file, 'saved')
-        with open(self.upload_description_file.path,'r', encoding='utf-8') as f:
-            lines = [x.strip().replace('\t',' ').split(' ') for x in f.readlines()[:] if len(x)>0]
-            class_name = ''
-            for x in lines:
-                if len(x)==1: 
-                    class_name = x[0]
+        if self.student_type == "师院一本":
+            with open(self.upload_description_file.path,'r', encoding='utf-8') as f:
+                lines = [x.strip().replace('\t',' ').split(' ') for x in f.readlines()[:] if len(x)>0]
+                class_name = ''
+                for x in lines:
+                    if len(x)==1: 
+                        class_name = x[0]
+                        continue
+                    if len(x)>5 and (x[0] !='学号'):
+                        Student.objects.get_or_create(class_name=class_name, student_id=x[0], student_name=x[1])
+
+        elif self.student_type == "南岳学院":
+            wb = load_workbook(self.upload_description_file.path)
+            ws = wb.active 
+            print('sheetnames: ', wb.sheetnames)
+
+            prep = ['A','B', 'J']
+            row_id = 1
+            empty_rows = 0
+            while empty_rows<10:
+                row_id = row_id + 1
+                id = ws[prep[0]+str(row_id)].value
+                name = ws[prep[1]+str(row_id)].value
+                classname = ws[prep[2]+str(row_id)].value
+                if id is None or id.strip() == '':
+                    empty_rows = empty_rows +1
                     continue
-                if len(x)>5 and (x[0] !='学号'):
-                    # print(class_name, x[0], x[1])
-                    Student.objects.get_or_create(class_name=class_name, student_id=x[0], student_name=x[1])
-                    # p = Student(class_name=class_name, student_id=x[0], student_name=x[1])
-                    # p.save()
+                
+                empty_rows = 0
+                print(id, name, classname)
+                if id == "学号" and name == "姓名" and classname == "班级":
+                    break
 
-
-
-
-# class CompletionQuestion(models.Model):
-#     class Meta:
-#         verbose_name = '填空题'
-#         verbose_name_plural = '填空题'
-
-#     def __str__(self):
-#         return '题'+str(self.id)
-
-#     problem_type = models.CharField("试卷类型", max_length=20, choices=EXAM_TYPE_CHOICES, default='1')
-#     question_text = models.TextField('题目', help_text="题目填空处使用 ______[6个英文下划线] 的形式表示", )
-#     answer_text = models.TextField('对应答案', help_text="题目中每个______对应的答案单独一行", default='')
-
-#     def problem_type_(self):
-#         return EXAM_TYPE_CHOICES[int(self.problem_type)-1][1]
-#     problem_type_.short_description = '试卷类型'
-
-#     def ansower_html_(self):
-#         answer_text = [x for x in self.answer_text.split('\n')]
-#         return format_html("<ol>") + \
-#                 format_html_join(
-#                 '\n', '<li style="color:{};">{}</li>',
-#                 (('black', x) for x in answer_text)
-#                 ) \
-#                 + format_html("</ol>")
-#     ansower_html_.short_description = '答案'
-
-#     def question_html_(self):
-#         question_text = [x for x in self.question_text.split('\n')]
-#         return format_html_join(
-#                 '', '<p style="color:{};">{}</p>',
-#                 (('black', x) for x in question_text)
-#                 )
-#     question_html_.short_description = '题目'
-
-#     def clean(self):
-#         question_text = self.question_text.replace(' ','')
-
-#         count_flags = question_text.count('______')  ## find all '______'
-#         if count_flags==0:
-#             raise ValidationError({'question_text': _('______ 缺失')})
-
-#         answer_text_list = self.answer_text.split('\n')
-#         answer_text_list = [x.strip() for x in answer_text_list if len(x.strip())>0]
-#         if len(answer_text_list) != count_flags:
-#             raise ValidationError({'question_text': _('______和答案数目不一致')})
+            empty_rows = 0
+            while empty_rows<10:
+                row_id = row_id + 1
+                student_id = ws[prep[0]+str(row_id)].value
+                name = ws[prep[1]+str(row_id)].value
+                classname = ws[prep[2]+str(row_id)].value
+                if student_id is None or student_id.strip() == '' or name is None or classname is None:
+                    empty_rows = empty_rows +1
+                    continue
+                
+                empty_rows = 0
+                # print(student_id, name, classname)
+                Student.objects.get_or_create(class_name=classname, student_id=student_id, student_name=name)
