@@ -7,6 +7,9 @@ class ChoiceQuestionAdmin(admin.ModelAdmin):
         list_display = ('__str__', 'question_html_', 'answer_list_', 'problem_type')
         list_display_links = ('__str__',)
 
+class CompleteQuestionAdmin(admin.ModelAdmin):
+        list_display = ('__str__', 'question_html_', 'answers_html_', 'problem_type')
+
 
 class CodingQuestionAdmin(admin.ModelAdmin):
         list_display = ('__str__', 'question_html_', 'code_html_','problem_type',)
@@ -30,6 +33,7 @@ admin.site.register(Exam, ExamAdmin)
 admin.site.register(Student, StudentAdmin)
 admin.site.register(ExamPaper, ExamPaperAdmin)
 admin.site.register(ChoiceQuestion, ChoiceQuestionAdmin)
+admin.site.register(CompleteQuestion, CompleteQuestionAdmin)
 admin.site.register(CodingQuestion, CodingQuestionAdmin)
 
 admin.site.site_title = "C语言期末考试后台管理系统"

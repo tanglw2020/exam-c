@@ -66,10 +66,12 @@ class Exam(models.Model):
     passwd_second_login = models.CharField('二次登录密码', max_length=200, default='3333')
     opened = models.BooleanField("考场开放？", default=True)
 
-    choice_question_num = models.IntegerField(verbose_name="选择题个数", default=20)
+    choice_question_num = models.IntegerField(verbose_name="选择题个数", default=15)
     choice_question_score = models.IntegerField(verbose_name="选择题分值", default=2)
-    coding_question_num = models.IntegerField(verbose_name="编程题个数", default=4)
-    coding_question_score = models.IntegerField(verbose_name="编程题分值", default=15)
+    complete_question_num = models.IntegerField(verbose_name="填空题个数", default=3)
+    complete_question_score = models.IntegerField(verbose_name="填空题分值", default=10)
+    coding_question_num = models.IntegerField(verbose_name="编程题个数", default=2)
+    coding_question_score = models.IntegerField(verbose_name="编程题分值", default=20)
 
     def __str__(self):
         return '考场-'+str(self.id)
@@ -80,12 +82,13 @@ class Exam(models.Model):
 
     def clean(self):
         score = self.choice_question_num*self.choice_question_score + \
-            self.coding_question_num * self.coding_question_score
+            self.coding_question_num * self.coding_question_score + self.complete_question_score * self.complete_question_num
         if score != 100:
             raise ValidationError(_('总分值不等于100'))
 
     def all_question_stat_(self):
         return '选择题'+str(self.choice_question_score)+'分X'+str(self.choice_question_num)+ \
+              ' + ' + '填空题'+str(self.complete_question_score)+'分X'+str(self.complete_question_num)+ \
             ' + '+'编程题'+str(self.coding_question_score)+'分X'+str(self.coding_question_num)
     all_question_stat_.short_description = '考题统计'
 
@@ -137,6 +140,10 @@ class ExamPaper(models.Model):
     choice_questions = models.TextField("选择题列表", max_length=1000,  blank=True, default='')
     choice_question_answers = models.TextField("选择题答案列表", max_length=1000, blank=True,  default='')
     choice_question_results = models.TextField("选择题评分", max_length=1000, blank=True,  default='')
+
+    complete_questions = models.TextField("填空题列表", max_length=1000,  blank=True, default='')
+    complete_question_answers = models.TextField("填空题答案列表", max_length=1000, blank=True,  default='')
+    complete_question_results = models.TextField("填空题评分", max_length=1000, blank=True,  default='')
 
     coding_questions = models.TextField("编程题列表", max_length=1000, blank=True, default='')
     coding_question_answers = models.TextField("编程题答案列表", max_length=1000, blank=True, default='')
@@ -358,6 +365,38 @@ class ChoiceQuestion(models.Model):
                 ) \
                 + format_html("</ul>")
     answer_list_.short_description = '题目选项'
+
+
+
+class CompleteQuestion(models.Model):
+    class Meta:
+        verbose_name = '题目-填空题'
+        verbose_name_plural = '题目-填空题'
+
+    def __str__(self):
+        return '填空题-'+str(self.id)
+
+    problem_type = models.CharField("试卷类型", max_length=20, choices=EXAM_TYPE_CHOICES, default='1')
+
+    question_text = models.TextField('题干', help_text = '包含题目说明和代码段，其中填空数固定为4，用带圈的数字标出')
+    answers = models.TextField('答案', help_text ='3个答案各占一行')
+
+    def question_html_(self):
+        question_text = [x for x in self.question_text.split('\n')]
+        return format_html_join(
+                '', '<p style="color:{};">{}</p>',
+                (('black', x) for x in question_text)
+                )
+    question_html_.short_description = '题目'
+
+
+    def answers_html_(self):
+        question_text = [x for x in self.answers.split('\n')]
+        return format_html_join(
+                '', '<p style="color:{};">{}</p>',
+                (('black', x) for x in question_text)
+                )
+    answers_html_.short_description = '答案'
 
 
 class CodingQuestion(models.Model):
