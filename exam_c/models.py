@@ -187,6 +187,9 @@ class ExamPaper(models.Model):
         return self.coding_question_answers.split(',')
     coding_question_answers_.short_description = '编程题答案'
 
+    def complete_question_answers_(self):
+        return self.coding_question_answers.split('\n')
+
     def choice_question_answers_(self):
         return self.choice_question_answers.split(',')
     choice_question_answers_.short_description = '选择题答案'
@@ -198,6 +201,13 @@ class ExamPaper(models.Model):
             choice_questions_all.append(ChoiceQuestion.objects.get(pk=i))
         return choice_questions_all
     choice_questions_all_.short_description = '全部选择题'
+
+    def complete_questions_all_(self):
+        question_ids = [int(x) for x in self.complete_questions.split(',') if len(x)]
+        questions_all = []
+        for i in choice_question_ids:
+            choice_questions_all.append(CompleteQuestion.objects.get(pk=i))
+        return questions_all
 
     def coding_questions_all_(self):
         coding_question_ids = [int(x) for x in self.coding_questions.split(',') if len(x)]
@@ -212,6 +222,10 @@ class ExamPaper(models.Model):
         question_database_id = int(self.choice_questions.split(',')[question_id-1])
         return ChoiceQuestion.objects.get(pk=question_database_id)
     choice_questions_pk_.short_description = 'pk选择题'
+
+    def complete_questions_pk_(self, question_id):
+        question_database_id = int(self.complete_questions.split(',')[question_id-1])
+        return CompleteQuestion.objects.get(pk=question_database_id)
 
     def coding_questions_pk_(self, question_id):
         question_database_id = int(self.coding_questions.split(',')[question_id-1])
@@ -236,6 +250,17 @@ class ExamPaper(models.Model):
         old_answers = self.choice_question_results.split(',')
         old_answers[question_id-1] = score
         self.choice_question_results = ','.join(old_answers)
+        self.save()
+
+    def update_complete_question_answer_result_(self, question_id, submit_answers):
+        old_answers = self.complete_question_answers.split('\n')
+        old_answers[question_id-1] = ','.join(submit_answers)
+        self.complete_question_answers = '\n'.join(old_answers)
+
+        question = self.complete_questions_pk_(question_id)
+        old_results = self.complete_question_results.split(',')
+        old_results[question_id-1] = question.score(submit_answers)
+        self.complete_question_results = ','.join(old_results)
         self.save()
 
     def choice_question_result_stat(self):
@@ -380,6 +405,15 @@ class CompleteQuestion(models.Model):
 
     question_text = models.TextField('题干', help_text = '包含题目说明和代码段，其中填空数固定为4，用带圈的数字标出')
     answers = models.TextField('答案', help_text ='3个答案各占一行')
+
+
+    def score(self, submit_answers):
+        answers = self.answers.split(',')
+        cnt = 0
+        for i in range(len(submit_answers)):
+            if submit_answers[i] == answers[i]: cnt = cnt + 1
+        return  cnt*1.0 / len(answers)
+
 
     def question_html_(self):
         question_text = [x for x in self.question_text.split('\n')]

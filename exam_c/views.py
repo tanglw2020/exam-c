@@ -184,6 +184,13 @@ def login(request):
                 exam_paper.choice_question_results = ','.join(['0' for i in range(len(choice_questions_ids))])
 
                 #########
+                complete_questions_ids = [str(x['id']) for x in CompleteQuestion.objects.values('id')]
+                complete_questions_ids = random.sample(complete_questions_ids, exam.complete_question_num)
+                exam_paper.complete_questions = ','.join(complete_questions_ids)
+                exam_paper.complete_question_answers = '\n'.join(['#' for i in range(len(complete_questions_ids))])
+                exam_paper.complete_question_results = ','.join(['0' for i in range(len(complete_questions_ids))])
+
+                #########
                 code_questions_ids = [str(x['id']) for x in CodingQuestion.objects.values('id')]
                 code_questions_ids = random.sample(code_questions_ids, coding_question_numb)
                 exam_paper.coding_questions = ','.join(code_questions_ids)
