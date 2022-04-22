@@ -188,7 +188,7 @@ class ExamPaper(models.Model):
     coding_question_answers_.short_description = '编程题答案'
 
     def complete_question_answers_(self):
-        return self.coding_question_answers.split('\n')
+        return self.complete_question_answers.split('\n')
 
     def choice_question_answers_(self):
         return self.choice_question_answers.split(',')

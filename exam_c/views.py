@@ -71,6 +71,36 @@ def exampage_choice_question(request, exampage_id, choice_question_id):
     return render(request, 'exam_c/exam_page_choice_question.html', context)
 
 
+def exampage_complete_question(request, exampage_id, question_id):
+    try:
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
+    except ExamPaper.DoesNotExist:
+        return HttpResponseRedirect(reverse('c:login'))
+    
+    uploadsucc = False
+    question = exam_page.complete_questions_pk_(question_id)
+    if request.method == 'POST':
+        form = UploadOutputFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            ## update coding answers
+            # exam_page.update_coding_question_answer_result_(coding_question_id, output_save_path)
+            uploadsucc = True
+    else:
+        form = UploadOutputFileForm()
+    # if not exam_page.enabled:
+        # ;
+        # form.fields['file'].widget.attrs['disabled'] = True
+
+    context = {
+        'exam_page': exam_page,
+        'question': question,
+        'question_id': question_id,
+        'uploadsucc': uploadsucc,
+        'form': form,
+        }
+    return render(request, 'exam_c/exam_page_complete_question.html', context)
+
+
 def handle_uploaded_file(f, output_save_path):
     # print(os.path.join(root_path,filename))
     with open(output_save_path, 'wb') as destination:
@@ -106,7 +136,6 @@ def exampage_coding_question(request, exampage_id, coding_question_id):
         'exam': exam_page.exam,
         'student': exam_page.student,
         'exam_page': exam_page,
-        'choice_questions_answers': exam_page.choice_question_answers_(),
         'coding_questions_answers': exam_page.coding_question_answers_(),
         'coding_question': exam_page.coding_questions_pk_(coding_question_id),
         'coding_question_id': coding_question_id,
