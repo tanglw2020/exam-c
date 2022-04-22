@@ -14,7 +14,7 @@ import random
 from pathlib import Path
 
 from .models import *
-from .forms import StudentForm, UploadOutputFileForm, StudentFormSecondLogin
+from .forms import StudentForm, UploadOutputFileForm, StudentFormSecondLogin, CompleteForm
 # Create your views here.
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -80,16 +80,27 @@ def exampage_complete_question(request, exampage_id, question_id):
     uploadsucc = False
     question = exam_page.complete_questions_pk_(question_id)
     if request.method == 'POST':
-        form = UploadOutputFileForm(request.POST, request.FILES)
+        form = CompleteForm(request.POST)
         if form.is_valid():
-            ## update coding answers
-            # exam_page.update_coding_question_answer_result_(coding_question_id, output_save_path)
+            cleaned_data = form.cleaned_data
+            answers = [cleaned_data['position1'], cleaned_data['position2'],cleaned_data['position3'] ]
+            exam_page.update_complete_question_answer_result_(question_id, answers)
             uploadsucc = True
     else:
-        form = UploadOutputFileForm()
-    # if not exam_page.enabled:
-        # ;
-        # form.fields['file'].widget.attrs['disabled'] = True
+        answers = exam_page.complete_question_answers_()[question_id-1].split(',')
+        if len(answers) == 3:
+            data = {'position1': answers[0], 
+                    'position2': answers[1], 
+                    'position3': answers[2],
+                    }
+            form = CompleteForm(data)
+        else:
+            form = CompleteForm()
+
+    if (not exam_page.enabled) or (not exam_page.choice_question_finished):
+        form.fields['position1'].widget.attrs['disabled'] = True
+        form.fields['position2'].widget.attrs['disabled'] = True
+        form.fields['position3'].widget.attrs['disabled'] = True
 
     context = {
         'exam_page': exam_page,
@@ -129,7 +140,7 @@ def exampage_coding_question(request, exampage_id, coding_question_id):
             uploadsucc = True
     else:
         form = UploadOutputFileForm()
-    if not exam_page.enabled:
+    if (not exam_page.enabled) or (not exam_page.choice_question_finished):
         form.fields['file'].widget.attrs['disabled'] = True
 
     context = {

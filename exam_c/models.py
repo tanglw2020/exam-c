@@ -259,7 +259,7 @@ class ExamPaper(models.Model):
 
         question = self.complete_questions_pk_(question_id)
         old_results = self.complete_question_results.split(',')
-        old_results[question_id-1] = question.score(submit_answers)
+        old_results[question_id-1] = str(question.score(submit_answers))
         self.complete_question_results = ','.join(old_results)
         self.save()
 

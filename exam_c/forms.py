@@ -50,3 +50,9 @@ class StudentFormSecondLogin(forms.Form):
 
 class UploadOutputFileForm(forms.Form):
     file = forms.FileField()
+
+
+class CompleteForm(forms.Form):
+    position1 = forms.CharField(label='代码①')
+    position2 = forms.CharField(label='代码②')
+    position3 = forms.CharField(label='代码③')
