@@ -28,7 +28,7 @@ class ExamPaperAdmin(admin.ModelAdmin):
 
 
 ###########
-admin.site.register([StudentInfoImporter])
+admin.site.register([StudentInfoImporter, ChoiceQuestionImporter])
 admin.site.register(Exam, ExamAdmin)
 admin.site.register(Student, StudentAdmin)
 admin.site.register(ExamPaper, ExamPaperAdmin)
