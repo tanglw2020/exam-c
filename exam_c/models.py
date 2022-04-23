@@ -304,14 +304,19 @@ class ExamPaper(models.Model):
         return self.exam.coding_question_num, len(answers), sum
 
     def coding_question_result_detail(self):
-        answers = [x for x in self.coding_question_answers.split(',') if x!='+']
-        results = [float(x) for x in self.coding_question_results.split(',')]
-        return results
+        return [int(float(x)*self.exam.coding_question_score) for x in self.coding_question_results.split(',')]
+
+    def complete_question_result_detail(self):
+        return [int(float(x)*self.exam.complete_question_score) for x in self.complete_question_results.split(',')]
+
+    def choice_question_result_detail(self):
+        return [int(float(x)*self.exam.choice_question_score) for x in self.choice_question_results.split(',')]
 
     def total_score(self):
-        _,_, choice_question_correct_num = self.choice_question_result_stat()
-        _,_, coding_question_correct_num = self.coding_question_result_stat()
-        return choice_question_correct_num*self.exam.choice_question_score + coding_question_correct_num*self.exam.coding_question_score
+        scores = self.choice_question_result_detail() + self.coding_question_result_detail() + self.complete_question_result_detail()
+        score = 0
+        for s in scores: score = score + s
+        return score
 
 
 def validate_zipfile(value):
