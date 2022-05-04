@@ -66,11 +66,11 @@ class Exam(models.Model):
     passwd_second_login = models.CharField('二次登录密码', max_length=200, default='3333')
     opened = models.BooleanField("考场开放？", default=True)
 
-    choice_question_num = models.IntegerField(verbose_name="选择题个数", default=15)
+    choice_question_num = models.IntegerField(verbose_name="选择题个数", default=20)
     choice_question_score = models.IntegerField(verbose_name="选择题分值", default=2)
-    complete_question_num = models.IntegerField(verbose_name="填空题个数", default=3)
+    complete_question_num = models.IntegerField(verbose_name="填空题个数", default=4)
     complete_question_score = models.IntegerField(verbose_name="填空题分值", default=10)
-    coding_question_num = models.IntegerField(verbose_name="编程题个数", default=2)
+    coding_question_num = models.IntegerField(verbose_name="编程题个数", default=1)
     coding_question_score = models.IntegerField(verbose_name="编程题分值", default=20)
 
     def __str__(self):
@@ -408,8 +408,8 @@ class CompleteQuestion(models.Model):
 
     problem_type = models.CharField("试卷类型", max_length=20, choices=EXAM_TYPE_CHOICES, default='1')
 
-    question_text = models.TextField('题干', help_text = '包含题目说明和代码段，其中填空数固定为4，用带圈的数字标出')
-    answers = models.TextField('答案', help_text ='3个答案各占一行')
+    question_text = models.TextField('题干', help_text = '包含题目说明和代码段，其中填空数固定为3，用带圈的数字标出')
+    answers = models.TextField('答案', help_text ='3个答案用英文逗号隔开')
 
 
     def score(self, submit_answers):
@@ -504,7 +504,7 @@ class CodingQuestion(models.Model):
             c_path, input_path = self.upload_c_file.path, self.upload_input_file.path
             print(zip_path)
             zf = zipfile.ZipFile(zip_path, 'w')
-            zf.write(c_path,'{}/main.c'.format('coding'))
+            zf.write(c_path,'{}/main.cpp'.format('coding'))
             zf.write(input_path,'{}/input.txt'.format('coding'))
             zf.close()
 

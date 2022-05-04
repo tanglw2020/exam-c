@@ -13,6 +13,7 @@ class CompleteQuestionAdmin(admin.ModelAdmin):
 
 class CodingQuestionAdmin(admin.ModelAdmin):
         list_display = ('__str__', 'question_html_', 'code_html_','problem_type',)
+        # list_display = ('__str__', 'question_html_', 'problem_type',)
 
 
 class StudentAdmin(admin.ModelAdmin):
