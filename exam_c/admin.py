@@ -6,6 +6,7 @@ from .models import *
 class ChoiceQuestionAdmin(admin.ModelAdmin):
         list_display = ('__str__', 'question_html_', 'answer_list_', 'problem_type')
         list_display_links = ('__str__',)
+        search_fields = ('question_text',)
 
 class CompleteQuestionAdmin(admin.ModelAdmin):
         list_display = ('__str__', 'question_html_', 'answers_html_', 'problem_type')
@@ -18,6 +19,7 @@ class CodingQuestionAdmin(admin.ModelAdmin):
 
 class StudentAdmin(admin.ModelAdmin):
         list_display = ('class_name', 'student_name', 'student_id', )
+        search_fields = ('student_name', 'student_id',)
 
 
 class ExamAdmin(admin.ModelAdmin):

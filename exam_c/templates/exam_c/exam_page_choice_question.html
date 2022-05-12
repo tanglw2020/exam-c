@@ -213,10 +213,10 @@
         success: function (result) {
           if (result.result) {
             $("#qtext").html(result.result);
-            $("#pchoice1").html(result.choice1);
-            $("#pchoice2").html(result.choice2);
-            $("#pchoice3").html(result.choice3);
-            $("#pchoice4").html(result.choice4);
+            $("#pchoice1").text(result.choice1);
+            $("#pchoice2").text(result.choice2);
+            $("#pchoice3").text(result.choice3);
+            $("#pchoice4").text(result.choice4);
             $("#current_ans").html(result.answer);
             if (result.answer) window.cur_ans = 1;
           }
