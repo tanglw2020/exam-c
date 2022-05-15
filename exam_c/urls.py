@@ -13,6 +13,7 @@ urlpatterns = [
     path('examroom/<int:exam_id>', views.exam_room, name='examroom'),
     path('api/sendchoiceanswer/<exampage_id>/<int:choice_question_id>/<int:choice_id>', views.api_handle_choice_answer,name='api-choiceanswer'),
     path('api/getchoicetext/<exampage_id>/<int:choice_question_id>', views.api_get_choice_text,name='api-choicetext'),
+    path('api/getchoicestatus/<exampage_id>', views.api_get_choice_status,name='api-getchoicestatus'),
     path('api/setchoicefininshed/<exampage_id>', views.api_set_choice_finished,name='api-setchoicefinished'),
     
     path('api/getservertime/<exampage_id>', views.api_get_server_time,name='api-getservertime'),

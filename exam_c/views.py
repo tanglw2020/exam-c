@@ -53,10 +53,10 @@ def exampage_choice_question(request, exampage_id, choice_question_id):
 
     choice_question_id = 1  # fix the id 
     question_links = []
-    for a in exam_page.choice_question_answers_():
-        if a=='+': question_links.append('btn btn-light')
-        else: question_links.append('btn btn-success')
-    question_links[choice_question_id-1] = 'btn btn-primary'
+    # for a in exam_page.choice_question_answers_():
+    #     if a=='+': question_links.append('btn btn-light')
+    #     else: question_links.append('btn btn-success')
+    # question_links[choice_question_id-1] = 'btn btn-primary'
     current_choice = exam_page.choice_question_answers_()[choice_question_id-1]
     if current_choice=='+': current_choice=''
     context = {
@@ -355,6 +355,18 @@ def api_get_choice_text(request, exampage_id, choice_question_id):
         }
     return HttpResponse(json.dumps(a), content_type='application/json')
 
+
+
+@csrf_exempt
+def api_get_choice_status(request, exampage_id):
+
+    try:
+        exam_page = ExamPaper.objects.get(unique_key=exampage_id)
+    except ExamPaper.DoesNotExist:
+        a = {"result":"null"}
+        return HttpResponse(json.dumps(a), content_type='application/json')
+    a = {"result": exam_page.choice_question_answers,}
+    return HttpResponse(json.dumps(a), content_type='application/json')
 
 @csrf_exempt
 def api_set_choice_finished(request, exampage_id):

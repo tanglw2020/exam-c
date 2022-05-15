@@ -16,22 +16,6 @@
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" type="text/css" href="{% static 'exam_c/css/bootstrap.min.css' %}">
 
-  <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-  <!-- <link href="../../assets/css/ie10-viewport-bug-workaround.css" rel="stylesheet"> -->
-
-  <!-- Custom styles for this template -->
-  <!-- <link href="starter-template.css" rel="stylesheet"> -->
-
-  <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-  <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-  <!-- <script src="../../assets/js/ie-emulation-modes-warning.js"></script> -->
-
-  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-  <!--[if lt IE 9]>
-      <script src="https://cdn.bootcss.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-      <script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
-    <![endif]-->
-
   <style>
     body {
       padding-top: 50px;
@@ -63,8 +47,6 @@
       margin-top: 2px;
     }
   </style>
-
-
 
 </head>
 
@@ -133,11 +115,7 @@
           <button id="end-choice" class="btn-end" onclick="back_index()" style="margin:16px 20px">返回首页</button>
           {% endif %}
         </h2>
-        <div class="btn-group" role="group" aria-label="choice questions">
-          {% for a in question_links %}
-          <button id="jump{{ forloop.counter }}" class="{{ a }}" onclick="jump2Question('{{ forloop.counter }}')">
-            题{{ forloop.counter }}</button>
-          {% endfor %}
+        <div id="button-group" class="btn-group" role="group" aria-label="choice questions">
         </div>
       </div>
     </div>
@@ -201,6 +179,45 @@
     }
     setTimeout('checkFullscreen()', 10);
   </script>
+
+
+  <script type="text/javascript">
+    function createButtons() {
+      $.ajax({
+        url: '/c/api/getchoicestatus/{{ exam_page.unique_key }}',
+        type: 'POST',
+        data: {},
+        dataType: 'json',
+        timeout: 10000,
+        success: function (result) {
+          if (result.result) {
+            var status = result.result.split(",");
+
+            for (var i = 0; i < status.length; i++) {
+              // console.log(i + status[i]);
+              var btn_id = String(i + 1);
+              var $btn = $(`<button class='btn btn-light'></button>`).text("题" + btn_id)
+                .attr('id', 'jump' + btn_id)
+                .attr('onclick', 'jump2Question(' + btn_id + ')');
+
+              if (i == 0) {
+                $btn.attr('class', 'btn btn-primary');
+              }
+              else if (status[i] != '+') {
+                $btn.attr('class', 'btn btn-success');
+              }
+
+              $btn.appendTo("#button-group");
+              // <button id="jump{{ forloop.counter }}" class="{{ a }}" onclick="jump2Question('{{ forloop.counter }}')">
+            }
+
+          }
+        }
+      });
+    }
+    createButtons();
+  </script>
+
 
   <script type="text/javascript">
     function getqText(question_id) {
