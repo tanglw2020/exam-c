@@ -84,6 +84,7 @@ def exampage_complete_question(request, exampage_id, question_id):
         if form.is_valid():
             cleaned_data = form.cleaned_data
             answers = [cleaned_data['position1'], cleaned_data['position2'],cleaned_data['position3'] ]
+            print("answers: ", answers)
             exam_page.update_complete_question_answer_result_(question_id, answers)
             uploadsucc = True
     else:

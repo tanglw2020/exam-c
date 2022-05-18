@@ -70,8 +70,8 @@ class Exam(models.Model):
     choice_question_score = models.IntegerField(verbose_name="选择题分值", default=2)
     complete_question_num = models.IntegerField(verbose_name="填空题个数", default=4)
     complete_question_score = models.IntegerField(verbose_name="填空题分值", default=10)
-    coding_question_num = models.IntegerField(verbose_name="编程题个数", default=1)
-    coding_question_score = models.IntegerField(verbose_name="编程题分值", default=20)
+    coding_question_num = models.IntegerField(verbose_name="编程题个数", default=2)
+    coding_question_score = models.IntegerField(verbose_name="编程题分值", default=10)
 
     def __str__(self):
         return '考场-'+str(self.id)
@@ -414,6 +414,7 @@ class CompleteQuestion(models.Model):
 
     def score(self, submit_answers):
         answers = self.answers.split(',')
+        print(answers, submit_answers)
         cnt = 0
         for i in range(len(submit_answers)):
             if submit_answers[i] == answers[i]: cnt = cnt + 1
