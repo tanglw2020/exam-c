@@ -61,7 +61,7 @@ class Exam(models.Model):
     problem_type = models.CharField("试卷类型", max_length=20, choices=EXAM_TYPE_CHOICES, default='1')
     creator = models.CharField('创建人', max_length=200, default='..老师')
     info_text = models.CharField('考试信息', max_length=200, default='C语言期末考试')
-    period = models.CharField("考试时长", max_length=5, choices=PERIOD_CHOICES, default='1')
+    period = models.CharField("考试时长", max_length=5, choices=PERIOD_CHOICES, default='2')
 
     passwd_second_login = models.CharField('二次登录密码', max_length=200, default='3333')
     opened = models.BooleanField("考场开放？", default=True)
