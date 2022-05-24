@@ -68,9 +68,9 @@ class Exam(models.Model):
 
     choice_question_num = models.IntegerField(verbose_name="选择题个数", default=20)
     choice_question_score = models.IntegerField(verbose_name="选择题分值", default=2)
-    complete_question_num = models.IntegerField(verbose_name="填空题个数", default=4)
+    complete_question_num = models.IntegerField(verbose_name="填空题个数", default=5)
     complete_question_score = models.IntegerField(verbose_name="填空题分值", default=10)
-    coding_question_num = models.IntegerField(verbose_name="编程题个数", default=2)
+    coding_question_num = models.IntegerField(verbose_name="编程题个数", default=1)
     coding_question_score = models.IntegerField(verbose_name="编程题分值", default=10)
 
     def __str__(self):
